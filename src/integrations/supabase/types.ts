@@ -285,10 +285,40 @@ export type Database = {
         }
         Relationships: []
       }
+      resources: {
+        Row: {
+          active: boolean
+          calendar_id: string | null
+          company_id: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          calendar_id?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          calendar_id?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       agenda_config: {
         Row: {
           buffer_minutos: number
-          company_id: string
+          resource_id: string
           created_at: string
           dias_semana: number[]
           duracao_minutos: number
@@ -300,7 +330,7 @@ export type Database = {
         }
         Insert: {
           buffer_minutos?: number
-          company_id: string
+          resource_id: string
           created_at?: string
           dias_semana?: number[]
           duracao_minutos?: number
@@ -312,7 +342,7 @@ export type Database = {
         }
         Update: {
           buffer_minutos?: number
-          company_id?: string
+          resource_id?: string
           created_at?: string
           dias_semana?: number[]
           duracao_minutos?: number

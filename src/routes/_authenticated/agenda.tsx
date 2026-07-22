@@ -1,13 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { CalendarCheck2, CalendarX2 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { CalendarCheck2, CalendarX2, Pencil, Plus, Trash2, UserRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/lib/company";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Tables } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { GradientButton, PageHeader } from "@/components/gradient-button";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +33,10 @@ const DAYS = [
 ];
 
 const N8N_CALENDAR_CONNECT_URL = "https://webhook.inoovaweb.com.br/webhook/calendario-status";
+
+type Resource = Tables<"resources">;
+type AgendaConfig = Tables<"agenda_config">;
+type ResourceWithAgenda = Resource & { agenda_config: AgendaConfig | null };
 
 function useGoogleCalendarConnection(companyId: string | undefined) {
   return useQuery({
@@ -58,8 +71,8 @@ function GoogleCalendarCard({ companyId }: { companyId: string | undefined }) {
         </CardTitle>
         <CardDescription>
           {connected
-            ? `Conectado${connection?.calendar_id ? ` — ${connection.calendar_id}` : ""}.`
-            : "Conecte sua agenda do Google para a IA marcar visitas automaticamente."}
+            ? "Conectado. Agora cadastre os profissionais e cole o ID da agenda do Google de cada um."
+            : "Conecte a conta do Google da empresa uma única vez — depois cadastre a agenda de cada profissional abaixo."}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -77,7 +90,10 @@ function GoogleCalendarCard({ companyId }: { companyId: string | undefined }) {
   );
 }
 
-type AgendaForm = {
+type ResourceForm = {
+  name: string;
+  calendar_id: string;
+  active: boolean;
   dias_semana: number[];
   hora_inicio: string;
   hora_fim: string;
@@ -86,7 +102,10 @@ type AgendaForm = {
   max_por_dia: number | null;
 };
 
-const DEFAULT_FORM: AgendaForm = {
+const DEFAULT_FORM: ResourceForm = {
+  name: "",
+  calendar_id: "",
+  active: true,
   dias_semana: [1, 2, 3, 4, 5],
   hora_inicio: "09:00",
   hora_fim: "18:00",
@@ -95,37 +114,35 @@ const DEFAULT_FORM: AgendaForm = {
   max_por_dia: null,
 };
 
-function ScheduleCard({ companyId }: { companyId: string | undefined }) {
-  const queryClient = useQueryClient();
-  const [form, setForm] = useState<AgendaForm>(DEFAULT_FORM);
+function ResourceDialog({
+  companyId,
+  resource,
+  open,
+  onOpenChange,
+  onSaved,
+}: {
+  companyId: string;
+  resource: ResourceWithAgenda | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSaved: () => void;
+}) {
+  const [form, setForm] = useState<ResourceForm>(() =>
+    resource
+      ? {
+          name: resource.name,
+          calendar_id: resource.calendar_id ?? "",
+          active: resource.active,
+          dias_semana: resource.agenda_config?.dias_semana ?? DEFAULT_FORM.dias_semana,
+          hora_inicio: resource.agenda_config?.hora_inicio.slice(0, 5) ?? DEFAULT_FORM.hora_inicio,
+          hora_fim: resource.agenda_config?.hora_fim.slice(0, 5) ?? DEFAULT_FORM.hora_fim,
+          duracao_minutos: resource.agenda_config?.duracao_minutos ?? DEFAULT_FORM.duracao_minutos,
+          buffer_minutos: resource.agenda_config?.buffer_minutos ?? DEFAULT_FORM.buffer_minutos,
+          max_por_dia: resource.agenda_config?.max_por_dia ?? null,
+        }
+      : DEFAULT_FORM,
+  );
   const [saving, setSaving] = useState(false);
-
-  const { data: config, isLoading } = useQuery({
-    queryKey: ["agenda-config", companyId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("agenda_config")
-        .select("*")
-        .eq("company_id", companyId!)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!companyId,
-  });
-
-  useEffect(() => {
-    if (config) {
-      setForm({
-        dias_semana: config.dias_semana,
-        hora_inicio: config.hora_inicio.slice(0, 5),
-        hora_fim: config.hora_fim.slice(0, 5),
-        duracao_minutos: config.duracao_minutos,
-        buffer_minutos: config.buffer_minutos,
-        max_por_dia: config.max_por_dia,
-      });
-    }
-  }, [config]);
 
   const toggleDay = (day: number) => {
     setForm((f) => ({
@@ -137,122 +154,289 @@ function ScheduleCard({ companyId }: { companyId: string | undefined }) {
   };
 
   const handleSave = async () => {
-    if (!companyId) return;
+    if (!form.name.trim()) {
+      toast.error("Nome do profissional é obrigatório");
+      return;
+    }
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from("agenda_config")
-        .upsert({ company_id: companyId, ...form }, { onConflict: "company_id" });
-      if (error) throw error;
-      queryClient.invalidateQueries({ queryKey: ["agenda-config", companyId] });
-      toast.success("Agenda salva.");
+      const resourcePayload = {
+        company_id: companyId,
+        name: form.name.trim(),
+        calendar_id: form.calendar_id.trim() || null,
+        active: form.active,
+      };
+
+      let resourceId = resource?.id;
+      if (resource) {
+        const { error } = await supabase.from("resources").update(resourcePayload).eq("id", resource.id);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from("resources").insert(resourcePayload).select("id").single();
+        if (error) throw error;
+        resourceId = data.id;
+      }
+
+      const { error: agendaError } = await supabase.from("agenda_config").upsert(
+        {
+          resource_id: resourceId,
+          dias_semana: form.dias_semana,
+          hora_inicio: form.hora_inicio,
+          hora_fim: form.hora_fim,
+          duracao_minutos: form.duracao_minutos,
+          buffer_minutos: form.buffer_minutos,
+          max_por_dia: form.max_por_dia,
+        },
+        { onConflict: "resource_id" },
+      );
+      if (agendaError) throw agendaError;
+
+      toast.success(resource ? "Profissional atualizado." : "Profissional cadastrado.");
+      onSaved();
+      onOpenChange(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Falha ao salvar a agenda");
+      toast.error(err instanceof Error ? err.message : "Falha ao salvar o profissional");
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <Card className="shadow-card">
-      <CardHeader>
-        <CardTitle className="text-base">Horários de atendimento</CardTitle>
-        <CardDescription>Dias, horários e o tempo de folga entre um atendimento e outro.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        <div>
-          <Label className="mb-2 block">Dias da semana</Label>
-          <div className="flex flex-wrap gap-2">
-            {DAYS.map((day) => {
-              const active = form.dias_semana.includes(day.value);
-              return (
-                <button
-                  key={day.value}
-                  type="button"
-                  onClick={() => toggleDay(day.value)}
-                  className={cn(
-                    "rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors",
-                    active
-                      ? "border-transparent bg-primary text-primary-foreground"
-                      : "border-border bg-transparent text-muted-foreground hover:bg-muted",
-                  )}
-                >
-                  {day.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{resource ? "Editar profissional" : "Novo profissional"}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
           <div>
-            <Label htmlFor="hora_inicio">Início</Label>
+            <Label htmlFor="r_name">Nome</Label>
             <Input
-              id="hora_inicio"
-              type="time"
-              value={form.hora_inicio}
-              onChange={(e) => setForm((f) => ({ ...f, hora_inicio: e.target.value }))}
+              id="r_name"
+              value={form.name}
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              placeholder="Ex: Dra. Vera Vilhena"
               className="mt-1.5"
             />
           </div>
           <div>
-            <Label htmlFor="hora_fim">Fim</Label>
+            <Label htmlFor="r_calendar">ID da agenda no Google Calendar</Label>
             <Input
-              id="hora_fim"
-              type="time"
-              value={form.hora_fim}
-              onChange={(e) => setForm((f) => ({ ...f, hora_fim: e.target.value }))}
+              id="r_calendar"
+              value={form.calendar_id}
+              onChange={(e) => setForm((f) => ({ ...f, calendar_id: e.target.value }))}
+              placeholder="algumcodigo@group.calendar.google.com"
               className="mt-1.5"
             />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Encontre em Google Calendar → Configurações da agenda do profissional → "ID da agenda".
+            </p>
           </div>
-        </div>
 
-        <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="duracao">Duração de cada atendimento (min)</Label>
+            <Label className="mb-2 block">Dias da semana</Label>
+            <div className="flex flex-wrap gap-2">
+              {DAYS.map((day) => {
+                const active = form.dias_semana.includes(day.value);
+                return (
+                  <button
+                    key={day.value}
+                    type="button"
+                    onClick={() => toggleDay(day.value)}
+                    className={cn(
+                      "rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors",
+                      active
+                        ? "border-transparent bg-primary text-primary-foreground"
+                        : "border-border bg-transparent text-muted-foreground hover:bg-muted",
+                    )}
+                  >
+                    {day.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="r_inicio">Início</Label>
+              <Input
+                id="r_inicio"
+                type="time"
+                value={form.hora_inicio}
+                onChange={(e) => setForm((f) => ({ ...f, hora_inicio: e.target.value }))}
+                className="mt-1.5"
+              />
+            </div>
+            <div>
+              <Label htmlFor="r_fim">Fim</Label>
+              <Input
+                id="r_fim"
+                type="time"
+                value={form.hora_fim}
+                onChange={(e) => setForm((f) => ({ ...f, hora_fim: e.target.value }))}
+                className="mt-1.5"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="r_duracao">Duração da consulta (min)</Label>
+              <Input
+                id="r_duracao"
+                type="number"
+                min={5}
+                step={5}
+                value={form.duracao_minutos}
+                onChange={(e) => setForm((f) => ({ ...f, duracao_minutos: Number(e.target.value) }))}
+                className="mt-1.5"
+              />
+            </div>
+            <div>
+              <Label htmlFor="r_buffer">Folga entre consultas (min)</Label>
+              <Input
+                id="r_buffer"
+                type="number"
+                min={0}
+                step={5}
+                value={form.buffer_minutos}
+                onChange={(e) => setForm((f) => ({ ...f, buffer_minutos: Number(e.target.value) }))}
+                className="mt-1.5"
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="r_max">Máximo de consultas por dia (opcional)</Label>
             <Input
-              id="duracao"
+              id="r_max"
               type="number"
-              min={5}
-              step={5}
-              value={form.duracao_minutos}
-              onChange={(e) => setForm((f) => ({ ...f, duracao_minutos: Number(e.target.value) }))}
-              className="mt-1.5"
-            />
-          </div>
-          <div>
-            <Label htmlFor="buffer">Tempo de folga entre atendimentos (min)</Label>
-            <Input
-              id="buffer"
-              type="number"
-              min={0}
-              step={5}
-              value={form.buffer_minutos}
-              onChange={(e) => setForm((f) => ({ ...f, buffer_minutos: Number(e.target.value) }))}
-              className="mt-1.5"
+              min={1}
+              value={form.max_por_dia ?? ""}
+              onChange={(e) => setForm((f) => ({ ...f, max_por_dia: e.target.value ? Number(e.target.value) : null }))}
+              placeholder="Sem limite"
+              className="mt-1.5 max-w-[160px]"
             />
           </div>
         </div>
-
-        <div>
-          <Label htmlFor="max_por_dia">Máximo de atendimentos por dia (opcional)</Label>
-          <Input
-            id="max_por_dia"
-            type="number"
-            min={1}
-            value={form.max_por_dia ?? ""}
-            onChange={(e) => setForm((f) => ({ ...f, max_por_dia: e.target.value ? Number(e.target.value) : null }))}
-            placeholder="Sem limite"
-            className="mt-1.5 max-w-[200px]"
-          />
-        </div>
-
-        <div className="flex justify-end pt-2">
-          <GradientButton onClick={handleSave} loading={saving} disabled={isLoading}>
-            Salvar agenda
+        <DialogFooter>
+          <GradientButton onClick={handleSave} loading={saving}>
+            Salvar
           </GradientButton>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ResourcesSection({ companyId }: { companyId: string | undefined }) {
+  const queryClient = useQueryClient();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<ResourceWithAgenda | null>(null);
+
+  const { data: resources, isLoading } = useQuery({
+    queryKey: ["resources", companyId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("resources")
+        .select("*, agenda_config(*)")
+        .eq("company_id", companyId!)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data as unknown as ResourceWithAgenda[];
+    },
+    enabled: !!companyId,
+  });
+
+  const handleDelete = async (resource: Resource) => {
+    if (!confirm(`Remover "${resource.name}"?`)) return;
+    const { error } = await supabase.from("resources").delete().eq("id", resource.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    queryClient.invalidateQueries({ queryKey: ["resources", companyId] });
+    toast.success("Profissional removido.");
+  };
+
+  return (
+    <Card className="shadow-card">
+      <CardHeader className="flex-row items-center justify-between space-y-0">
+        <div>
+          <CardTitle className="text-base">Profissionais</CardTitle>
+          <CardDescription>Cada um com sua própria agenda, horário e duração de consulta.</CardDescription>
+        </div>
+        <GradientButton
+          onClick={() => {
+            setEditing(null);
+            setDialogOpen(true);
+          }}
+          disabled={!companyId}
+        >
+          <Plus className="size-4" />
+          Novo
+        </GradientButton>
+      </CardHeader>
+      <CardContent>
+        {!isLoading && resources?.length === 0 && (
+          <p className="text-sm text-muted-foreground">Nenhum profissional cadastrado ainda.</p>
+        )}
+        <div className="space-y-3">
+          {resources?.map((resource) => (
+            <div
+              key={resource.id}
+              className="flex items-center justify-between gap-3 rounded-xl border border-border p-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted">
+                  <UserRound className="size-4 text-foreground" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">
+                    {resource.name}
+                    {!resource.active && (
+                      <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                        Inativo
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {resource.agenda_config
+                      ? `${resource.agenda_config.hora_inicio.slice(0, 5)}–${resource.agenda_config.hora_fim.slice(0, 5)} · consultas de ${resource.agenda_config.duracao_minutos}min`
+                      : "Sem agenda configurada"}
+                    {resource.calendar_id ? " · Google Calendar conectado" : " · sem calendar_id"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setEditing(resource);
+                    setDialogOpen(true);
+                  }}
+                >
+                  <Pencil className="size-3.5" />
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => handleDelete(resource)}>
+                  <Trash2 className="size-3.5" />
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
       </CardContent>
+
+      {companyId && (
+        <ResourceDialog
+          companyId={companyId}
+          resource={editing}
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          onSaved={() => queryClient.invalidateQueries({ queryKey: ["resources", companyId] })}
+        />
+      )}
     </Card>
   );
 }
@@ -262,13 +446,13 @@ function Page() {
 
   return (
     <div>
-      <PageHeader title="Agenda & Calendário" description="Conecte o Google Calendar e defina seus horários de atendimento." />
+      <PageHeader title="Agenda & Calendário" description="Conecte o Google Calendar e cadastre a agenda de cada profissional." />
       <div className="grid max-w-6xl grid-cols-1 gap-5 p-6 lg:grid-cols-12 lg:p-10">
         <div className="lg:col-span-5">
           <GoogleCalendarCard companyId={company?.id} />
         </div>
         <div className="lg:col-span-7">
-          <ScheduleCard companyId={company?.id} />
+          <ResourcesSection companyId={company?.id} />
         </div>
       </div>
     </div>
