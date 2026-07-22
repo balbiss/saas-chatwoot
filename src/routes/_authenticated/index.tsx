@@ -1783,7 +1783,7 @@ function FieldSection({
     }
   };
   const addField = () => {
-    const label = kind === "parameter" ? "New parameter" : "New return";
+    const label = kind === "parameter" ? "Novo parâmetro" : "Novo retorno";
     const key = slugifyKey(label, [...allFields.map((f) => f.key), ...formulas.map((f) => f.key)]);
     const newField: Field = {
       key,
