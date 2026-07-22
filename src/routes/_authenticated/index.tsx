@@ -887,7 +887,7 @@ function Page() {
 
   const deleteDeal = async (id: string) => {
     if (!id) return;
-    if (!window.confirm("Delete this deal? This can't be undone.")) return;
+    if (!window.confirm("Excluir este negócio? Isso não pode ser desfeito.")) return;
     try {
       const { error } = await supabase.from("deals").delete().eq("id", id);
       if (error) throw error;
@@ -969,7 +969,7 @@ function Page() {
       toast.error(error.message);
       return;
     }
-    toast.success(`Deleted "${tpl.name}"`, {
+    toast.success(`"${tpl.name}" excluído`, {
       action: {
         label: "Desfazer",
         onClick: async () => {
@@ -1112,7 +1112,7 @@ function Page() {
                       }}
                       className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition"
                     >
-                      <Save className="size-3.5" /> Save current as template…
+                      <Save className="size-3.5" /> Salvar atual como modelo…
                     </button>
                   </div>
                 </motion.div>
@@ -1161,7 +1161,7 @@ function Page() {
                       onClick={newDeal}
                       className="flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
                     >
-                      <Plus className="size-3" /> New deal
+                      <Plus className="size-3" /> Novo negócio
                     </button>
                   </div>
                   <div className="p-1.5 max-h-96 overflow-y-auto scrollbar-thin">
@@ -2616,7 +2616,7 @@ function ResearchPanel({
         return;
       }
       const productWithPitch = pitch.trim()
-        ? `${freshProduct}\n\nSPECIFIC PITCH PARA ESTE PROSPECT:\n${pitch.trim()}`
+        ? `${freshProduct}\n\nPITCH ESPECÍFICO PARA ESTE PROSPECT:\n${pitch.trim()}`
         : freshProduct;
       const [r, brandResult] = await Promise.allSettled([
         enrichFn({
@@ -2713,7 +2713,7 @@ function ResearchPanel({
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1], delay: collapsed ? 0.25 : 0 }}
               className="rotate-180 [writing-mode:vertical-rl] font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground group-hover:text-foreground transition-colors"
             >
-              Company Research
+              Pesquisa da Empresa
             </motion.div>
           </div>
 
@@ -2741,7 +2741,7 @@ function ResearchPanel({
         <div className={cn("p-4 border-b border-border space-y-3 shrink-0", inSheet && "pr-12")}>
           <div className="flex items-center justify-between">
             <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-              Company Research
+              Pesquisa da Empresa
             </span>
             <div className="flex bg-muted rounded p-0.5">
               {(["fast", "deep"] as const).map((m) => (
@@ -2766,21 +2766,21 @@ function ResearchPanel({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && run()}
-              placeholder="https://acme.com or describe…"
+              placeholder="https://acme.com ou descreva…"
               className="w-full bg-background border border-border rounded-lg pl-8 pr-3 py-2 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
             />
           </div>
           <div className="space-y-1">
             <label className="font-mono text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
-              Pitch for this prospect{" "}
+              Pitch para este prospect{" "}
               <span className="text-muted-foreground/60 font-normal normal-case tracking-normal">
-                — optional
+                — opcional
               </span>
             </label>
             <textarea
               value={pitch}
               onChange={(e) => setPitch(e.target.value)}
-              placeholder="What you're selling them and why it fits — e.g. 'Replace their 3 disconnected internal tools with one customizable platform their ops team can edit themselves.'"
+              placeholder="O que você está vendendo e por que faz sentido — ex.: 'Substituir suas 3 ferramentas internas desconectadas por uma plataforma customizável que o time de operações pode editar sozinho.'"
               rows={3}
               className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs leading-relaxed focus:ring-1 focus:ring-primary focus:outline-none resize-none"
             />
@@ -2796,7 +2796,7 @@ function ResearchPanel({
             ) : (
               <Search className="size-3.5" />
             )}
-            {loading ? "Researching" : `Run ${mode === "deep" ? "deep" : "fast"} research`}
+            {loading ? "Pesquisando" : `Pesquisa ${mode === "deep" ? "profunda" : "rápida"}`}
           </button>
         </div>
 
@@ -2866,7 +2866,7 @@ function ResearchPanel({
         {/* Hint about settings */}
         {(!myCompany || !myProduct) && (
           <div className="p-3 bg-muted/40 border-t border-border text-[10px] text-muted-foreground">
-            Tip: defina sua empresa + produto em <span className="font-bold">Configurações</span> for
+            Dica: defina sua empresa + produto em <span className="font-bold">Configurações</span> para
             ângulos mais afiados de "Por Que Encaixamos".
           </div>
         )}
@@ -3136,7 +3136,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
             <label className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
               Tagline{" "}
               <span className="text-muted-foreground/60 font-normal normal-case tracking-normal">
-                — optional
+                — opcional
               </span>
             </label>
             <input
@@ -3156,14 +3156,14 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
             onClick={onClose}
             className="px-3 py-1.5 text-xs font-medium rounded-md hover:bg-muted"
           >
-            Cancel
+            Cancelar
           </button>
           <button
             onClick={save}
             disabled={saving}
             className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-foreground text-background rounded-md hover:bg-foreground/90 active:scale-95 disabled:opacity-60"
           >
-            {saving && <Loader2 className="size-3 animate-spin" />} Save
+            {saving && <Loader2 className="size-3 animate-spin" />} Salvar
           </button>
         </div>
       </motion.div>
@@ -3208,7 +3208,7 @@ function StartHereGuide({ onClose }: { onClose: () => void }) {
     <div className="h-full flex flex-col">
       <div className="px-6 pt-6 pb-4 border-b border-border">
         <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
-          <HelpCircle className="size-3" /> Start here
+          <HelpCircle className="size-3" /> Comece aqui
         </div>
         <h2 className="mt-2 text-xl font-bold tracking-tight text-balance">
           Build a branded ROI business case in five minutes
@@ -3259,7 +3259,7 @@ function StartHereGuide({ onClose }: { onClose: () => void }) {
             Edit any input on the left. Results recompute live. Use the{" "}
             <span className="font-medium text-foreground">Conservador / Esperado / Otimista</span>{" "}
             tabs to stress-test the case. Formulas live in the template — you can save a customized
-            version via <span className="font-mono text-[11.5px]">Save current as template…</span>.
+            version via <span className="font-mono text-[11.5px]">Salvar atual como modelo…</span>.
           </p>
         </Step>
         <Step n={5} icon={FileDown} title="Crie e compartilhe o relatório">
@@ -3626,7 +3626,7 @@ function ShareView({
   const url = isLocal ? "" : buildShareUrl(dealId);
   const copy = async () => {
     if (!url) {
-      toast.error("Save the deal first to share it.");
+      toast.error("Salve o negócio primeiro para compartilhar.");
       return;
     }
     try {
@@ -3662,7 +3662,7 @@ function ShareView({
   };
   const open = () => {
     if (!url) {
-      toast.error("Save the deal first to share it.");
+      toast.error("Salve o negócio primeiro para compartilhar.");
       return;
     }
     window.open(url, "_blank", "noopener,noreferrer");
@@ -3693,7 +3693,7 @@ function ShareView({
 
         {isLocal ? (
           <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            Save the deal once to generate a shareable link.
+            Salve o negócio uma vez para gerar um link compartilhável.
           </div>
         ) : (
           <>
@@ -4189,7 +4189,7 @@ function PdfPreview({
                       onClick={() => edit!.addItem("why_we_fit")}
                       className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 hover:text-neutral-900 flex items-center gap-1"
                     >
-                      <Plus className="size-3" /> Add point
+                      <Plus className="size-3" /> Adicionar ponto
                     </button>
                   )}
                 </div>
@@ -4275,7 +4275,7 @@ function PdfPreview({
                       onClick={() => edit!.addItem("talking_points")}
                       className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 hover:text-neutral-900 flex items-center gap-1"
                     >
-                      <Plus className="size-3" /> Add point
+                      <Plus className="size-3" /> Adicionar ponto
                     </button>
                   )}
                 </div>
@@ -4675,7 +4675,7 @@ function ReportEditor({
             fit.w,
             fit.h,
             undefined,
-            "FAST",
+            "RÁPIDO",
           );
           cursorX += fit.w + 12;
         } catch {
@@ -4700,7 +4700,7 @@ function ReportEditor({
             fit.w,
             fit.h,
             undefined,
-            "FAST",
+            "RÁPIDO",
           );
           rightCursorX -= fit.w + 12;
         } catch {
@@ -5424,7 +5424,7 @@ function SaveTemplateModal({
             onClick={onClose}
             className="px-3 py-1.5 text-xs font-medium rounded-md hover:bg-accent transition"
           >
-            Cancel
+            Cancelar
           </button>
           <button
             onClick={() =>
