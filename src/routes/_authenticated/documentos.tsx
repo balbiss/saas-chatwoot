@@ -72,7 +72,7 @@ function Page() {
   return (
     <div>
       <PageHeader title="Documentos" description="PDFs que a IA pode enviar aos clientes durante o atendimento." />
-      <div className="max-w-2xl p-6 lg:p-10">
+      <div className="max-w-3xl p-6 lg:p-10">
         <input
           ref={fileInputRef}
           type="file"

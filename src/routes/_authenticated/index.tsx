@@ -22,7 +22,7 @@ function Page() {
         title={`Olá${company?.name ? `, ${company.name}` : ""}`}
         description="Configure seu atendimento abaixo."
       />
-      <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:p-10">
+      <div className="grid max-w-6xl grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-4 lg:p-10">
         {SHORTCUTS.map((item, i) => {
           const Icon = item.icon;
           return (

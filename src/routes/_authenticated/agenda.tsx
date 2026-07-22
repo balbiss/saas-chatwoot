@@ -263,9 +263,13 @@ function Page() {
   return (
     <div>
       <PageHeader title="Agenda & Calendário" description="Conecte o Google Calendar e defina seus horários de atendimento." />
-      <div className="grid max-w-3xl grid-cols-1 gap-5 p-6 lg:p-10">
-        <GoogleCalendarCard companyId={company?.id} />
-        <ScheduleCard companyId={company?.id} />
+      <div className="grid max-w-6xl grid-cols-1 gap-5 p-6 lg:grid-cols-12 lg:p-10">
+        <div className="lg:col-span-5">
+          <GoogleCalendarCard companyId={company?.id} />
+        </div>
+        <div className="lg:col-span-7">
+          <ScheduleCard companyId={company?.id} />
+        </div>
       </div>
     </div>
   );

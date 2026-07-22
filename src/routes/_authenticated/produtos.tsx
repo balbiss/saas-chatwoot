@@ -192,7 +192,7 @@ function Page() {
   return (
     <div>
       <PageHeader title="Produtos" description="Fotos, preços e disponibilidade que a IA usa para responder clientes." />
-      <div className="p-6 lg:p-10">
+      <div className="max-w-6xl p-6 lg:p-10">
         <div className="mb-5 flex justify-end">
           <GradientButton
             onClick={() => {
@@ -209,7 +209,7 @@ function Page() {
           <p className="text-sm text-muted-foreground">Nenhum produto cadastrado ainda.</p>
         )}
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {products?.map((product) => (
             <Card key={product.id} className="overflow-hidden shadow-card">
               <div className="flex aspect-video items-center justify-center bg-muted">

@@ -76,83 +76,92 @@ function Page() {
         title="Prompt da IA"
         description="Explique como a IA deve se comportar, o tom de voz e as regras de atendimento."
       />
-      <div className="max-w-2xl space-y-5 p-6 lg:p-10">
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Wand2 className="size-4 text-primary" />
-              Não sabe por onde começar?
-            </CardTitle>
-            <CardDescription>
-              Descreva seu negócio em poucas frases (o que vocês fazem, horário, tipo de atendimento) e a IA escreve um prompt profissional pra você revisar.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              placeholder="Ex: Somos uma imobiliária em Curitiba, vendemos e alugamos apartamentos, atendemos de segunda a sábado das 9h às 18h."
-              className="resize-y"
-            />
-            <div className="mt-3 flex justify-end">
-              <GradientButton onClick={handleGenerate} loading={generating} disabled={isLoading}>
-                <Wand2 className="size-4" />
-                Gerar com IA
+      <div className="max-w-6xl p-6 lg:p-10">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+          <div className="space-y-5 lg:col-span-5">
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Wand2 className="size-4 text-primary" />
+                  Não sabe por onde começar?
+                </CardTitle>
+                <CardDescription>
+                  Descreva seu negócio em poucas frases (o que vocês fazem, horário, tipo de atendimento) e a IA escreve um prompt profissional pra você revisar.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={4}
+                  placeholder="Ex: Somos uma imobiliária em Curitiba, vendemos e alugamos apartamentos, atendemos de segunda a sábado das 9h às 18h."
+                  className="resize-y"
+                />
+                <div className="mt-3 flex justify-end">
+                  <GradientButton onClick={handleGenerate} loading={generating} disabled={isLoading}>
+                    <Wand2 className="size-4" />
+                    Gerar com IA
+                  </GradientButton>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="text-base">Ou comece com um modelo pronto</CardTitle>
+                <CardDescription>Escolha o tipo de negócio mais parecido com o seu.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {PROMPT_TEMPLATES.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => replacePrompt(t.prompt)}
+                      className={cn(
+                        "rounded-full border border-border px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted",
+                      )}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-4 lg:col-span-7">
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Sparkles className="size-4 text-primary" />
+                  Instruções para a IA
+                </CardTitle>
+                <CardDescription>
+                  Depois de gerar ou escolher um modelo, ajuste os detalhes (nome da empresa, regras específicas) antes de salvar.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  disabled={isLoading}
+                  rows={22}
+                  placeholder="Ex: Você é a assistente virtual da Imobiliária XPTO. Seja cordial, responda dúvidas sobre imóveis disponíveis e sempre ofereça agendar uma visita..."
+                  className="resize-y font-mono text-[13px] leading-relaxed"
+                />
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">{prompt.length} caracteres</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="flex justify-end">
+              <GradientButton onClick={handleSave} loading={saving} disabled={isLoading}>
+                Salvar prompt
               </GradientButton>
             </div>
-          </CardContent>
-        </Card>
-
-        <div>
-          <p className="mb-2 text-sm font-medium text-muted-foreground">
-            Ou comece com um modelo pronto pro seu tipo de negócio:
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {PROMPT_TEMPLATES.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => replacePrompt(t.prompt)}
-                className={cn(
-                  "rounded-full border border-border px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted",
-                )}
-              >
-                {t.label}
-              </button>
-            ))}
           </div>
-        </div>
-
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="size-4 text-primary" />
-              Instruções para a IA
-            </CardTitle>
-            <CardDescription>
-              Depois de escolher um modelo, ajuste os detalhes (nome da empresa, regras específicas) antes de salvar.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              disabled={isLoading}
-              rows={18}
-              placeholder="Ex: Você é a assistente virtual da Imobiliária XPTO. Seja cordial, responda dúvidas sobre imóveis disponíveis e sempre ofereça agendar uma visita..."
-              className="resize-y font-mono text-[13px] leading-relaxed"
-            />
-            <div className="mt-2 flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">{prompt.length} caracteres</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="flex justify-end">
-          <GradientButton onClick={handleSave} loading={saving} disabled={isLoading}>
-            Salvar prompt
-          </GradientButton>
         </div>
       </div>
     </div>
