@@ -32,7 +32,7 @@ const DAYS = [
   { value: 6, label: "Sáb" },
 ];
 
-const N8N_CALENDAR_CONNECT_URL = "https://webhook.inoovaweb.com.br/webhook/calendario-status";
+const N8N_CALENDAR_CONNECT_URL = "https://webhook.inoovaweb.com.br/webhook/calendario-auth";
 
 type Resource = Tables<"resources">;
 type AgendaConfig = Tables<"agenda_config">;
