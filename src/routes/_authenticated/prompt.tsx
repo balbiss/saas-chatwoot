@@ -56,10 +56,7 @@ function Page() {
     if (!company) return;
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from("companies")
-        .update({ ai_prompt: prompt })
-        .eq("id", company.id);
+      const { error } = await supabase.from("companies").update({ ai_prompt: prompt }).eq("id", company.id);
       if (error) throw error;
       invalidateCompany();
       toast.success("Prompt salvo.");
