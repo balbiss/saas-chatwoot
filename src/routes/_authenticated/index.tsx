@@ -4675,7 +4675,7 @@ function ReportEditor({
             fit.w,
             fit.h,
             undefined,
-            "RÁPIDO",
+            "FAST",
           );
           cursorX += fit.w + 12;
         } catch {
@@ -4700,7 +4700,7 @@ function ReportEditor({
             fit.w,
             fit.h,
             undefined,
-            "RÁPIDO",
+            "FAST",
           );
           rightCursorX -= fit.w + 12;
         } catch {
