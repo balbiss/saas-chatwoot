@@ -36,7 +36,7 @@ function AuthPage() {
     e.preventDefault();
     if (busy) return;
     if (!email.trim() || !password) {
-      toast.error("Email and password are required");
+      toast.error("E-mail e senha são obrigatórios");
       return;
     }
     setBusy(true);
@@ -48,7 +48,7 @@ function AuthPage() {
           options: { emailRedirectTo: `${window.location.origin}/` },
         });
         if (error) throw error;
-        toast.success("Account created — you're signed in.");
+        toast.success("Conta criada — você já está conectado.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
@@ -58,7 +58,7 @@ function AuthPage() {
       }
       navigate({ to: "/", replace: true });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Authentication failed");
+      toast.error(err instanceof Error ? err.message : "Falha na autenticação");
     } finally {
       setBusy(false);
     }
@@ -75,7 +75,7 @@ function AuthPage() {
       if (result.redirected) return; // browser will redirect
       navigate({ to: "/", replace: true });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Google sign-in failed");
+      toast.error(err instanceof Error ? err.message : "Falha ao entrar com Google");
       setBusy(false);
     }
   };
@@ -109,7 +109,7 @@ function AuthPage() {
                 ROI SALES COMPANION
               </p>
               <Link to="/" className="text-[11px] text-muted-foreground hover:text-foreground">
-                ← Back home
+                ← Voltar ao início
               </Link>
             </div>
           </div>
@@ -130,7 +130,7 @@ function AuthPage() {
                   />
                 )}
                 <span className={`relative ${mode === m ? "text-foreground" : "text-muted-foreground"}`}>
-                  {m === "signin" ? "Sign in" : "Create account"}
+                  {m === "signin" ? "Entrar" : "Criar conta"}
                 </span>
               </button>
             ))}
@@ -147,9 +147,9 @@ function AuthPage() {
             >
               <h1 className="text-balance text-[28px] font-bold leading-[1.1] tracking-tight sm:text-3xl">
                 {mode === "signin" ? (
-                  <>Welcome back.<br /><span className="text-muted-foreground">Pick up where you left off.</span></>
+                  <>Bem-vindo de volta.<br /><span className="text-muted-foreground">Continue de onde parou.</span></>
                 ) : (
-                  <>Start closing<br /><span className="text-muted-foreground">with real numbers.</span></>
+                  <>Comece a fechar<br /><span className="text-muted-foreground">com números reais.</span></>
                 )}
               </h1>
             </motion.div>
@@ -164,20 +164,20 @@ function AuthPage() {
             className="group mt-7 flex w-full items-center justify-center gap-2.5 rounded-full border border-border bg-card py-3 text-sm font-medium shadow-sm transition-colors hover:bg-muted disabled:opacity-50"
           >
             <GoogleMark />
-            <span>Continue with Google</span>
+            <span>Continuar com Google</span>
             <ArrowRight className="size-4 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-60" />
           </motion.button>
 
           <div className="my-5 flex items-center gap-3 text-[10px] font-mono uppercase tracking-[0.24em] text-muted-foreground">
             <div className="h-px flex-1 bg-border" />
-            or email
+            ou e-mail
             <div className="h-px flex-1 bg-border" />
           </div>
 
           <form onSubmit={handleEmailSubmit} className="space-y-3.5">
             <Field
               icon={<Mail className="size-4" />}
-              label="Email"
+              label="E-mail"
               type="email"
               value={email}
               onChange={setEmail}
@@ -188,7 +188,7 @@ function AuthPage() {
             />
             <Field
               icon={<Lock className="size-4" />}
-              label="Password"
+              label="Senha"
               type="password"
               value={password}
               onChange={setPassword}
@@ -228,7 +228,7 @@ function AuthPage() {
                     className="flex items-center gap-2"
                   >
                     <Loader2 className="size-4 animate-spin" />
-                    Working…
+                    Processando…
                   </motion.span>
                 ) : (
                   <motion.span
@@ -238,7 +238,7 @@ function AuthPage() {
                     exit={{ opacity: 0, y: -6 }}
                     className="flex items-center gap-2"
                   >
-                    {mode === "signin" ? "Sign in" : "Create account"}
+                    {mode === "signin" ? "Entrar" : "Criar conta"}
                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                   </motion.span>
                 )}
@@ -247,7 +247,7 @@ function AuthPage() {
           </form>
 
           <p className="mt-6 text-[11px] leading-relaxed text-muted-foreground">
-            By continuing you agree to a private, single-user workspace. Your deals and templates stay scoped to your account.
+            Ao continuar, você concorda com um espaço de trabalho privado e individual. Seus deals e templates ficam restritos à sua conta.
           </p>
         </motion.div>
       </div>
@@ -374,9 +374,9 @@ function ShowcasePanel({ mode }: { mode: "signin" | "signup" }) {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="text-balance text-[44px] font-bold leading-[1.02] tracking-tight xl:text-[56px]"
           >
-            Turn discovery calls
+            Transforme calls de descoberta
             <br />
-            into <span className="italic text-white/70">defensible</span> ROI.
+            em ROI <span className="italic text-white/70">defensável</span>.
           </motion.h2>
 
           <motion.p
@@ -385,15 +385,15 @@ function ShowcasePanel({ mode }: { mode: "signin" | "signup" }) {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="max-w-md text-[15px] leading-relaxed text-white/65"
           >
-            Powerful sales tool for securing and serving clients.
+            Ferramenta poderosa de vendas para conquistar e atender clientes.
 
           </motion.p>
 
         </div>
 
         <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-[0.24em] text-white/45">
-          <span>Private workspace</span>
-          <span>RLS · scoped to you</span>
+          <span>Espaço privado</span>
+          <span>RLS · restrito a você</span>
         </div>
       </div>
     </div>
