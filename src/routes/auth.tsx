@@ -36,7 +36,7 @@ function AuthPage() {
     e.preventDefault();
     if (busy) return;
     if (!email.trim() || !password) {
-      toast.error("Email and password are required");
+      toast.error("E-mail e senha são obrigatórios");
       return;
     }
     setBusy(true);
@@ -48,7 +48,7 @@ function AuthPage() {
           options: { emailRedirectTo: `${window.location.origin}/` },
         });
         if (error) throw error;
-        toast.success("Account created — you're signed in.");
+        toast.success("Conta criada — você já está conectado.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
@@ -58,7 +58,7 @@ function AuthPage() {
       }
       navigate({ to: "/", replace: true });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Authentication failed");
+      toast.error(err instanceof Error ? err.message : "Falha na autenticação");
     } finally {
       setBusy(false);
     }
