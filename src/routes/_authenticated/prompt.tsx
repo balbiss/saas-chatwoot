@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Wand2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany, useInvalidateCompany } from "@/lib/company";
 import { PROMPT_TEMPLATES } from "@/lib/prompt-templates";
@@ -17,16 +17,39 @@ function Page() {
   const invalidateCompany = useInvalidateCompany();
   const [prompt, setPrompt] = useState("");
   const [saving, setSaving] = useState(false);
+  const [description, setDescription] = useState("");
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     if (company) setPrompt(company.ai_prompt ?? "");
   }, [company]);
 
-  const applyTemplate = (templatePrompt: string) => {
+  const replacePrompt = (newPrompt: string) => {
     if (prompt.trim() && !confirm("Isso vai substituir o texto atual do prompt. Continuar?")) {
       return;
     }
-    setPrompt(templatePrompt);
+    setPrompt(newPrompt);
+  };
+
+  const handleGenerate = async () => {
+    if (!description.trim()) {
+      toast.error("Descreva seu negócio em algumas frases primeiro.");
+      return;
+    }
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-prompt", {
+        body: { description: description.trim() },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      replacePrompt(data.prompt);
+      toast.success("Prompt gerado — revise e salve quando estiver bom.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao gerar o prompt com IA");
+    } finally {
+      setGenerating(false);
+    }
   };
 
   const handleSave = async () => {
@@ -54,16 +77,43 @@ function Page() {
         description="Explique como a IA deve se comportar, o tom de voz e as regras de atendimento."
       />
       <div className="max-w-2xl space-y-5 p-6 lg:p-10">
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Wand2 className="size-4 text-primary" />
+              Não sabe por onde começar?
+            </CardTitle>
+            <CardDescription>
+              Descreva seu negócio em poucas frases (o que vocês fazem, horário, tipo de atendimento) e a IA escreve um prompt profissional pra você revisar.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              placeholder="Ex: Somos uma imobiliária em Curitiba, vendemos e alugamos apartamentos, atendemos de segunda a sábado das 9h às 18h."
+              className="resize-y"
+            />
+            <div className="mt-3 flex justify-end">
+              <GradientButton onClick={handleGenerate} loading={generating} disabled={isLoading}>
+                <Wand2 className="size-4" />
+                Gerar com IA
+              </GradientButton>
+            </div>
+          </CardContent>
+        </Card>
+
         <div>
           <p className="mb-2 text-sm font-medium text-muted-foreground">
-            Comece com um modelo pronto pro seu tipo de negócio:
+            Ou comece com um modelo pronto pro seu tipo de negócio:
           </p>
           <div className="flex flex-wrap gap-2">
             {PROMPT_TEMPLATES.map((t) => (
               <button
                 key={t.id}
                 type="button"
-                onClick={() => applyTemplate(t.prompt)}
+                onClick={() => replacePrompt(t.prompt)}
                 className={cn(
                   "rounded-full border border-border px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted",
                 )}
