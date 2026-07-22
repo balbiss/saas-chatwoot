@@ -374,9 +374,9 @@ function ShowcasePanel({ mode }: { mode: "signin" | "signup" }) {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="text-balance text-[44px] font-bold leading-[1.02] tracking-tight xl:text-[56px]"
           >
-            Transforme calls de descoberta
+            InoovaWeb
             <br />
-            em ROI <span className="italic text-white/70">defensável</span>.
+            gerenciando seu <span className="italic text-white/70">atendimento</span>.
           </motion.h2>
 
           <motion.p
