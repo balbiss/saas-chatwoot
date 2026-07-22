@@ -12,7 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as ShareDealIdRouteImport } from './routes/share.$dealId'
+import { Route as AuthenticatedPromptRouteImport } from './routes/_authenticated/prompt'
+import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
+import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
+import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -28,46 +31,72 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ShareDealIdRoute = ShareDealIdRouteImport.update({
-  id: '/share/$dealId',
-  path: '/share/$dealId',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedPromptRoute = AuthenticatedPromptRouteImport.update({
+  id: '/prompt',
+  path: '/prompt',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProdutosRoute = AuthenticatedProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDocumentosRoute = AuthenticatedDocumentosRouteImport.update({
+  id: '/documentos',
+  path: '/documentos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
-  '/share/$dealId': typeof ShareDealIdRoute
+  '/agenda': typeof AuthenticatedAgendaRoute
+  '/documentos': typeof AuthenticatedDocumentosRoute
+  '/produtos': typeof AuthenticatedProdutosRoute
+  '/prompt': typeof AuthenticatedPromptRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
-  '/share/$dealId': typeof ShareDealIdRoute
+  '/agenda': typeof AuthenticatedAgendaRoute
+  '/documentos': typeof AuthenticatedDocumentosRoute
+  '/produtos': typeof AuthenticatedProdutosRoute
+  '/prompt': typeof AuthenticatedPromptRoute
   '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/share/$dealId': typeof ShareDealIdRoute
+  '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
+  '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
+  '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
+  '/_authenticated/prompt': typeof AuthenticatedPromptRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/share/$dealId'
+  fullPaths: '/' | '/auth' | '/agenda' | '/documentos' | '/produtos' | '/prompt'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/share/$dealId' | '/'
+  to: '/auth' | '/agenda' | '/documentos' | '/produtos' | '/prompt' | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/auth'
-    | '/share/$dealId'
+    | '/_authenticated/agenda'
+    | '/_authenticated/documentos'
+    | '/_authenticated/produtos'
+    | '/_authenticated/prompt'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  ShareDealIdRoute: typeof ShareDealIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -93,21 +122,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/share/$dealId': {
-      id: '/share/$dealId'
-      path: '/share/$dealId'
-      fullPath: '/share/$dealId'
-      preLoaderRoute: typeof ShareDealIdRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/prompt': {
+      id: '/_authenticated/prompt'
+      path: '/prompt'
+      fullPath: '/prompt'
+      preLoaderRoute: typeof AuthenticatedPromptRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/produtos': {
+      id: '/_authenticated/produtos'
+      path: '/produtos'
+      fullPath: '/produtos'
+      preLoaderRoute: typeof AuthenticatedProdutosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/documentos': {
+      id: '/_authenticated/documentos'
+      path: '/documentos'
+      fullPath: '/documentos'
+      preLoaderRoute: typeof AuthenticatedDocumentosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/agenda': {
+      id: '/_authenticated/agenda'
+      path: '/agenda'
+      fullPath: '/agenda'
+      preLoaderRoute: typeof AuthenticatedAgendaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
+  AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
+  AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
+  AuthenticatedPromptRoute: typeof AuthenticatedPromptRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
+  AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
+  AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
+  AuthenticatedPromptRoute: AuthenticatedPromptRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
@@ -117,8 +175,17 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  ShareDealIdRoute: ShareDealIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

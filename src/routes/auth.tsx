@@ -5,7 +5,7 @@ import { ArrowRight, Loader2, Mail, Lock, Sparkles, TrendingUp, Target, Zap } fr
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-import roiBubble from "@/assets/roi-bubble.png";
+import inoovawebIcon from "@/assets/inoovaweb-icon.png";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -98,7 +98,7 @@ function AuthPage() {
         >
           <div className="flex items-center gap-3">
             <motion.img
-              src={roiBubble}
+              src={inoovawebIcon}
               alt=""
               className="size-10 rounded-xl ring-1 ring-border"
               whileHover={{ rotate: -6, scale: 1.05 }}
@@ -106,7 +106,7 @@ function AuthPage() {
             />
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                ROI SALES COMPANION
+                INOOVAWEB
               </p>
               <Link to="/" className="text-[11px] text-muted-foreground hover:text-foreground">
                 ← Voltar ao início
@@ -149,7 +149,7 @@ function AuthPage() {
                 {mode === "signin" ? (
                   <>Bem-vindo de volta.<br /><span className="text-muted-foreground">Continue de onde parou.</span></>
                 ) : (
-                  <>Comece a fechar<br /><span className="text-muted-foreground">com números reais.</span></>
+                  <>Configure sua IA<br /><span className="text-muted-foreground">em poucos minutos.</span></>
                 )}
               </h1>
             </motion.div>
@@ -247,7 +247,7 @@ function AuthPage() {
           </form>
 
           <p className="mt-6 text-[11px] leading-relaxed text-muted-foreground">
-            Ao continuar, você concorda com um espaço de trabalho privado e individual. Seus deals e templates ficam restritos à sua conta.
+            Ao continuar, você concorda com um espaço de trabalho privado e individual. Seus dados ficam restritos à sua conta.
           </p>
         </motion.div>
       </div>
@@ -363,7 +363,7 @@ function ShowcasePanel({ mode }: { mode: "signin" | "signup" }) {
       <div className="relative z-10 flex h-full flex-col justify-between p-10 text-white xl:p-14">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[10px] uppercase tracking-[0.28em] opacity-80">
-            ROI SALES COMPANION
+            INOOVAWEB
           </span>
         </div>
 

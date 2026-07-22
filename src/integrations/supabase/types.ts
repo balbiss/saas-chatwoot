@@ -252,6 +252,171 @@ export type Database = {
         }
         Relationships: []
       }
+      companies: {
+        Row: {
+          ai_prompt: string | null
+          chatwoot_account_id: string | null
+          created_at: string
+          id: string
+          name: string | null
+          updated_at: string
+          user_id: string
+          whatsapp_phone: string | null
+        }
+        Insert: {
+          ai_prompt?: string | null
+          chatwoot_account_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          updated_at?: string
+          user_id?: string
+          whatsapp_phone?: string | null
+        }
+        Update: {
+          ai_prompt?: string | null
+          chatwoot_account_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          updated_at?: string
+          user_id?: string
+          whatsapp_phone?: string | null
+        }
+        Relationships: []
+      }
+      agenda_config: {
+        Row: {
+          buffer_minutos: number
+          company_id: string
+          created_at: string
+          dias_semana: number[]
+          duracao_minutos: number
+          hora_fim: string
+          hora_inicio: string
+          id: string
+          max_por_dia: number | null
+          updated_at: string
+        }
+        Insert: {
+          buffer_minutos?: number
+          company_id: string
+          created_at?: string
+          dias_semana?: number[]
+          duracao_minutos?: number
+          hora_fim?: string
+          hora_inicio?: string
+          id?: string
+          max_por_dia?: number | null
+          updated_at?: string
+        }
+        Update: {
+          buffer_minutos?: number
+          company_id?: string
+          created_at?: string
+          dias_semana?: number[]
+          duracao_minutos?: number
+          hora_fim?: string
+          hora_inicio?: string
+          id?: string
+          max_por_dia?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      google_calendar_connections: {
+        Row: {
+          calendar_id: string | null
+          company_id: string
+          connected_at: string | null
+          created_at: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          calendar_id?: string | null
+          company_id: string
+          connected_at?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          calendar_id?: string | null
+          company_id?: string
+          connected_at?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          available: boolean
+          category: string | null
+          company_id: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          photo_url: string | null
+          price: number | null
+          updated_at: string
+        }
+        Insert: {
+          available?: boolean
+          category?: string | null
+          company_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          photo_url?: string | null
+          price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          available?: boolean
+          category?: string | null
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          photo_url?: string | null
+          price?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      company_documents: {
+        Row: {
+          company_id: string
+          created_at: string
+          file_url: string
+          id: string
+          title: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          file_url: string
+          id?: string
+          title: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          file_url?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

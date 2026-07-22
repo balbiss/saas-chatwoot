@@ -22,7 +22,7 @@ function NotFoundComponent() {
         <h1 className="mt-2 text-4xl font-bold tracking-tight">Off the rails</h1>
         <p className="mt-3 text-sm text-muted-foreground">This route doesn't exist.</p>
         <Link to="/" className="mt-6 inline-flex rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90 transition">
-          Back to calculator
+          Voltar ao início
         </Link>
       </div>
     </div>
@@ -53,14 +53,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ROI SALES COMPANION — Sales Engineer's Calculator" },
-      { name: "description", content: "Real-time, customizable ROI business cases for sales engineers. Industry templates, prospect branding, and AI-powered company research in one place." },
-      { property: "og:title", content: "ROI SALES COMPANION — Sales Engineer's Calculator" },
-      { name: "twitter:title", content: "ROI SALES COMPANION — Sales Engineer's Calculator" },
-      { property: "og:description", content: "Real-time, customizable ROI business cases for sales engineers. Industry templates, prospect branding, and AI-powered company research in one place." },
-      { name: "twitter:description", content: "Real-time, customizable ROI business cases for sales engineers. Industry templates, prospect branding, and AI-powered company research in one place." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e825da39-65c5-42df-ad27-c239a63888e9/id-preview-924318d0--8c3cddd9-d894-4573-ad97-3bb0ac9e17ef.lovable.app-1778789012211.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e825da39-65c5-42df-ad27-c239a63888e9/id-preview-924318d0--8c3cddd9-d894-4573-ad97-3bb0ac9e17ef.lovable.app-1778789012211.png" },
+      { title: "Painel InoovaWeb — Configure seu atendimento" },
+      { name: "description", content: "Configure o prompt da IA, agenda, Google Calendar, produtos e documentos do seu atendimento." },
+      { property: "og:title", content: "Painel InoovaWeb — Configure seu atendimento" },
+      { name: "twitter:title", content: "Painel InoovaWeb — Configure seu atendimento" },
+      { property: "og:description", content: "Configure o prompt da IA, agenda, Google Calendar, produtos e documentos do seu atendimento." },
+      { name: "twitter:description", content: "Configure o prompt da IA, agenda, Google Calendar, produtos e documentos do seu atendimento." },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
     ],
