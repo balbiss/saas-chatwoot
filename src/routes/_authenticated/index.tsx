@@ -198,9 +198,9 @@ const ICONS: Record<string, typeof Cloud> = {
   "plus-square": PlusSquare,
 };
 const SCENARIOS = [
-  { key: "conservative", label: "Conservative" },
-  { key: "expected", label: "Expected" },
-  { key: "optimistic", label: "Optimistic" },
+  { key: "conservative", label: "Conservador" },
+  { key: "expected", label: "Esperado" },
+  { key: "optimistic", label: "Otimista" },
 ] as const;
 type ScenarioKey = (typeof SCENARIOS)[number]["key"];
 
@@ -215,40 +215,40 @@ const BUILTIN_TEMPLATES: Template[] = [
     parameters: [
       {
         key: "seats",
-        label: "Number of Seats",
+        label: "Número de Licenças",
         type: "slider",
         min: 5,
         max: 5000,
         step: 5,
         default: 250,
         unit: "users",
-        help: "Total active platform seats",
+        help: "Total de licenças ativas na plataforma",
       },
       {
         key: "price_per_seat",
-        label: "Price per Seat",
+        label: "Preço por Licença",
         type: "currency",
         min: 10,
         max: 2000,
         step: 10,
         default: 120,
-        help: "Annual price per seat",
+        help: "Preço anual por licença",
       },
       {
         key: "implementation_cost",
-        label: "Implementation Cost",
+        label: "Custo de Implementação",
         type: "currency",
         min: 0,
         max: 500000,
         step: 1000,
         default: 25000,
-        help: "One-time onboarding/setup",
+        help: "Onboarding/configuração única",
       },
     ],
     returns: [
       {
         key: "cost_per_member",
-        label: "Cost per Team Member",
+        label: "Custo por Membro do Time",
         type: "currency",
         min: 20000,
         max: 400000,
@@ -258,44 +258,44 @@ const BUILTIN_TEMPLATES: Template[] = [
       },
       {
         key: "expected_improvement",
-        label: "Expected Improvement",
+        label: "Melhoria Esperada",
         type: "percent",
         min: 1,
         max: 50,
         step: 1,
         default: 12,
-        help: "Estimated productivity lift",
+        help: "Ganho estimado de produtividade",
       },
       {
         key: "churn_reduction",
-        label: "Churn Reduction",
+        label: "Redução de Churn",
         type: "percent",
         min: 0,
         max: 50,
         step: 1,
         default: 8,
-        help: "Estimated retention lift",
+        help: "Aumento estimado de retenção",
       },
     ],
     formulas: [
       {
         key: "annual_cost",
-        label: "Annual Investment",
+        label: "Investimento Anual",
         expression: "seats * price_per_seat + implementation_cost",
       },
       {
         key: "productivity_savings",
-        label: "Productivity Savings",
+        label: "Economia de Produtividade",
         expression: "seats * cost_per_member * (expected_improvement / 100)",
       },
       {
         key: "churn_savings",
-        label: "Retention Value",
+        label: "Valor de Retenção",
         expression: "seats * price_per_seat * (churn_reduction / 100)",
       },
       {
         key: "annual_gain",
-        label: "Annual Gain",
+        label: "Ganho Anual",
         expression: "productivity_savings + churn_savings",
       },
     ],
@@ -306,7 +306,7 @@ const BUILTIN_TEMPLATES: Template[] = [
   },
   {
     id: "3b61b349-70f5-4c03-8a5b-30c80dc551ae",
-    name: "Professional Services",
+    name: "Serviços Profissionais",
     description: "Billable hours, utilization & margin uplift",
     industry: "services",
     icon: "briefcase",
@@ -314,28 +314,28 @@ const BUILTIN_TEMPLATES: Template[] = [
     parameters: [
       {
         key: "billable_consultants",
-        label: "Billable Consultants",
+        label: "Consultores Faturáveis",
         type: "slider",
         min: 1,
         max: 500,
         step: 1,
         default: 25,
         unit: "FTE",
-        help: "Headcount on billable work",
+        help: "Equipe em trabalho faturável",
       },
       {
         key: "engagement_cost",
-        label: "Tooling Investment",
+        label: "Investimento em Ferramentas",
         type: "currency",
         min: 0,
         max: 1000000,
         step: 1000,
         default: 80000,
-        help: "Annual platform cost",
+        help: "Custo anual da plataforma",
       },
       {
         key: "current_utilization",
-        label: "Current Utilization",
+        label: "Utilização Atual",
         type: "percent",
         min: 20,
         max: 95,
@@ -347,7 +347,7 @@ const BUILTIN_TEMPLATES: Template[] = [
     returns: [
       {
         key: "cost_per_member",
-        label: "Cost per Team Member",
+        label: "Custo por Membro do Time",
         type: "currency",
         min: 50000,
         max: 500000,
@@ -357,7 +357,7 @@ const BUILTIN_TEMPLATES: Template[] = [
       },
       {
         key: "expected_improvement",
-        label: "Expected Improvement",
+        label: "Melhoria Esperada",
         type: "percent",
         min: 1,
         max: 40,
@@ -367,10 +367,10 @@ const BUILTIN_TEMPLATES: Template[] = [
       },
     ],
     formulas: [
-      { key: "annual_cost", label: "Annual Investment", expression: "engagement_cost" },
+      { key: "annual_cost", label: "Investimento Anual", expression: "engagement_cost" },
       {
         key: "annual_gain",
-        label: "Annual Gain",
+        label: "Ganho Anual",
         expression: "billable_consultants * cost_per_member * (expected_improvement / 100)",
       },
     ],
@@ -382,7 +382,7 @@ const BUILTIN_TEMPLATES: Template[] = [
   {
     id: "362f59ba-cc72-482c-8b61-c5a8d1962819",
     name: "AI / Automation",
-    description: "Workflow automation with FTE equivalent savings",
+    description: "Automação de fluxos com economia equivalente a FTE",
     industry: "ai",
     icon: "sparkles",
     color_theme: "orange",
@@ -395,11 +395,11 @@ const BUILTIN_TEMPLATES: Template[] = [
         max: 1000000,
         step: 1000,
         default: 60000,
-        help: "Annual subscription",
+        help: "Assinatura anual",
       },
       {
         key: "implementation_cost",
-        label: "Implementation",
+        label: "Implementação",
         type: "currency",
         min: 0,
         max: 500000,
@@ -409,31 +409,31 @@ const BUILTIN_TEMPLATES: Template[] = [
       },
       {
         key: "workflows",
-        label: "Workflows Automated",
+        label: "Fluxos Automatizados",
         type: "slider",
         min: 1,
         max: 200,
         step: 1,
         default: 12,
         unit: "flows",
-        help: "Distinct processes automated",
+        help: "Processos distintos automatizados",
       },
     ],
     returns: [
       {
         key: "team_size",
-        label: "Team Size Impacted",
+        label: "Tamanho do Time Impactado",
         type: "slider",
         min: 1,
         max: 1000,
         step: 1,
         default: 50,
         unit: "people",
-        help: "Headcount whose work is automated",
+        help: "Equipe cujo trabalho é automatizado",
       },
       {
         key: "cost_per_member",
-        label: "Cost per Team Member",
+        label: "Custo por Membro do Time",
         type: "currency",
         min: 20000,
         max: 400000,
@@ -443,7 +443,7 @@ const BUILTIN_TEMPLATES: Template[] = [
       },
       {
         key: "expected_improvement",
-        label: "Expected Improvement",
+        label: "Melhoria Esperada",
         type: "percent",
         min: 1,
         max: 60,
@@ -459,23 +459,23 @@ const BUILTIN_TEMPLATES: Template[] = [
         max: 2000000,
         step: 1000,
         default: 75000,
-        help: "Annual cost of errors eliminated",
+        help: "Custo anual de erros eliminados",
       },
     ],
     formulas: [
       {
         key: "annual_cost",
-        label: "Annual Investment",
+        label: "Investimento Anual",
         expression: "platform_cost + implementation_cost",
       },
       {
         key: "labor_savings",
-        label: "Labor Savings",
+        label: "Economia de Mão de Obra",
         expression: "team_size * cost_per_member * (expected_improvement / 100)",
       },
       {
         key: "annual_gain",
-        label: "Annual Gain",
+        label: "Ganho Anual",
         expression: "labor_savings + error_reduction_value",
       },
     ],
@@ -494,30 +494,30 @@ const BUILTIN_TEMPLATES: Template[] = [
     parameters: [
       {
         key: "investment",
-        label: "Initial Investment",
+        label: "Investimento Inicial",
         type: "currency",
         min: 0,
         max: 1000000,
         step: 1000,
         default: 50000,
-        help: "Upfront cost",
+        help: "Custo inicial",
       },
     ],
     returns: [
       {
         key: "annual_savings",
-        label: "Annual Savings",
+        label: "Economia Anual",
         type: "currency",
         min: 0,
         max: 5000000,
         step: 1000,
         default: 150000,
-        help: "Direct savings per year",
+        help: "Economia direta por ano",
       },
     ],
     formulas: [
-      { key: "annual_cost", label: "Annual Investment", expression: "investment" },
-      { key: "annual_gain", label: "Annual Gain", expression: "annual_savings" },
+      { key: "annual_cost", label: "Investimento Anual", expression: "investment" },
+      { key: "annual_gain", label: "Ganho Anual", expression: "annual_savings" },
     ],
     outputs: [],
     scenarios: { conservative: 0.75, expected: 1, optimistic: 1.25 },
@@ -538,7 +538,7 @@ function createLocalDeal(t: Template): Deal {
   const now = new Date().toISOString();
   return {
     id: `local-${now}`,
-    name: "Untitled Deal",
+    name: "Negócio sem título",
     template_id: t.id,
     prospect_company: null,
     prospect_logo_url: null,
@@ -761,7 +761,7 @@ function Page() {
             ...dealTemplatePatch(t),
             values: defaultsFor(t),
             color_theme: getPreferredBrandColor(),
-            name: "Untitled Deal",
+            name: "Negócio sem título",
           })
           .select()
           .single();
@@ -770,7 +770,7 @@ function Page() {
           setTemplate(t);
           return;
         }
-        throw error ?? new Error("Could not create initial deal");
+        throw error ?? new Error("Não foi possível criar o negócio inicial");
       } catch (error) {
         console.warn("Deal storage unavailable; starting locally.", error);
         const t = templates[0];
@@ -841,7 +841,7 @@ function Page() {
         .insert({
           ...dealTemplatePatch(template),
           values: defaultsFor(template),
-          name: "Untitled Deal",
+          name: "Negócio sem título",
           color_theme: getPreferredBrandColor(),
         })
         .select()
@@ -854,7 +854,7 @@ function Page() {
     }
     refetchDeals();
     setShowDealsPicker(false);
-    toast.success("New deal created");
+    toast.success("Novo negócio criado");
   };
 
   const switchDeal = async (id: string) => {
@@ -879,7 +879,7 @@ function Page() {
       setTemplate(restoreCoreRoiFormulas(snapshot || base, base));
       setScenario(d.scenario);
     } catch (e) {
-      toast.error("Could not open that deal");
+      toast.error("Não foi possível abrir esse negócio");
       console.warn(e);
     }
     setShowDealsPicker(false);
@@ -887,11 +887,11 @@ function Page() {
 
   const deleteDeal = async (id: string) => {
     if (!id) return;
-    if (!window.confirm("Delete this deal? This can't be undone.")) return;
+    if (!window.confirm("Excluir este negócio? Isso não pode ser desfeito.")) return;
     try {
       const { error } = await supabase.from("deals").delete().eq("id", id);
       if (error) throw error;
-      toast.success("Deal deleted");
+      toast.success("Negócio excluído");
       if (id === deal?.id) {
         // Reload most recent remaining deal, or create a fresh one
         const { data } = await supabase
@@ -916,7 +916,7 @@ function Page() {
       }
       refetchDeals();
     } catch (e) {
-      toast.error("Could not delete deal");
+      toast.error("Não foi possível excluir o negócio");
       console.warn(e);
     }
   };
@@ -956,7 +956,7 @@ function Page() {
       template_snapshot: null,
       color_theme: savedTemplate.color_theme,
     });
-    toast.success("Template saved");
+    toast.success("Modelo salvo");
     setShowSaveTemplate(false);
     await refetchTemplates();
   };
@@ -969,9 +969,9 @@ function Page() {
       toast.error(error.message);
       return;
     }
-    toast.success(`Deleted "${tpl.name}"`, {
+    toast.success(`"${tpl.name}" excluído`, {
       action: {
-        label: "Undo",
+        label: "Desfazer",
         onClick: async () => {
           await supabase.from("templates").insert({
             name: tpl.name,
@@ -1046,7 +1046,7 @@ function Page() {
               onClick={() => setShowTemplatePicker((v) => !v)}
               className="flex items-center gap-2 text-xs font-medium hover:text-primary transition-colors group max-w-full"
             >
-              <span className="text-muted-foreground hidden lg:inline">Template:</span>
+              <span className="text-muted-foreground hidden lg:inline">Modelo:</span>
               <TplIcon className="size-3.5 shrink-0" />
               <span className="truncate min-w-0">{template.name}</span>
               <ChevronDown className="size-3 shrink-0 transition-transform group-hover:translate-y-px" />
@@ -1095,7 +1095,7 @@ function Page() {
                                 deleteTemplate(t.id);
                               }}
                               className="shrink-0 text-muted-foreground/60 hover:text-destructive transition p-1 rounded hover:bg-destructive/10"
-                              aria-label="Delete template"
+                              aria-label="Excluir modelo"
                             >
                               <Trash2 className="size-3.5" />
                             </button>
@@ -1112,7 +1112,7 @@ function Page() {
                       }}
                       className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition"
                     >
-                      <Save className="size-3.5" /> Save current as template…
+                      <Save className="size-3.5" /> Salvar atual como modelo…
                     </button>
                   </div>
                 </motion.div>
@@ -1127,8 +1127,8 @@ function Page() {
               <input
                 value={deal?.name ?? ""}
                 onChange={(e) => persist({ name: e.target.value })}
-                placeholder="Untitled Deal"
-                aria-label="Deal name"
+                placeholder="Negócio sem título"
+                aria-label="Nome do negócio"
                 spellCheck={false}
                 className="hidden md:inline-block bg-transparent text-xs font-medium w-[10rem] truncate rounded px-1.5 py-1 -mx-1 border border-transparent hover:border-border focus:border-primary focus:outline-none focus:bg-background transition-colors"
               />
@@ -1139,7 +1139,7 @@ function Page() {
                     return !v;
                   });
                 }}
-                aria-label="Open deals"
+                aria-label="Abrir negócios"
                 className="p-0.5 rounded hover:bg-accent transition-colors"
               >
                 <ChevronDown className="size-3 shrink-0" />
@@ -1161,7 +1161,7 @@ function Page() {
                       onClick={newDeal}
                       className="flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
                     >
-                      <Plus className="size-3" /> New deal
+                      <Plus className="size-3" /> Novo negócio
                     </button>
                   </div>
                   <div className="p-1.5 max-h-96 overflow-y-auto scrollbar-thin">
@@ -1191,7 +1191,7 @@ function Page() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-medium truncate">
-                                {d.name || "Untitled Deal"}
+                                {d.name || "Negócio sem título"}
                               </span>
                               {active && (
                                 <CheckCircle2 className="size-3 text-primary shrink-0" />
@@ -1203,7 +1203,7 @@ function Page() {
                               )}
                             </div>
                             <div className="text-[11px] text-muted-foreground truncate mt-0.5">
-                              {d.prospect_company || "No prospect"} · {when}
+                              {d.prospect_company || "Sem prospect"} · {when}
                             </div>
                           </div>
                           <button
@@ -1212,7 +1212,7 @@ function Page() {
                               deleteDeal(d.id);
                             }}
                             className="shrink-0 text-muted-foreground/60 hover:text-destructive transition p-1 rounded hover:bg-destructive/10"
-                            aria-label="Delete deal"
+                            aria-label="Excluir negócio"
                           >
                             <Trash2 className="size-3.5" />
                           </button>
@@ -1228,21 +1228,21 @@ function Page() {
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <button
             onClick={() => setResearchSheetOpen(true)}
-            aria-label="Open company research"
+            aria-label="Abrir pesquisa da empresa"
             className="lg:hidden flex items-center gap-1.5 px-2 sm:px-3 py-1.5 text-xs font-medium border border-border rounded-full hover:bg-accent transition active:scale-95"
           >
             <Search className="size-3.5" /> <span className="hidden lg:inline">Research</span>
           </button>
           <button
             onClick={() => setShowGuide(true)}
-            aria-label="Start here guide"
+            aria-label="Guia inicial"
             className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition active:scale-95 shadow-primary"
           >
-            <HelpCircle className="size-3.5" /> <span className="hidden md:inline">Start here</span>
+            <HelpCircle className="size-3.5" /> <span className="hidden md:inline">Comece aqui</span>
           </button>
           <button
             onClick={() => setShowSettings(true)}
-            aria-label="Settings"
+            aria-label="Configurações"
             className="flex items-center justify-center size-8 rounded-full hover:bg-accent transition"
           >
             <SettingsIcon className="size-4" />
@@ -1252,18 +1252,18 @@ function Page() {
               await supabase.auth.signOut();
               window.location.assign("/auth");
             }}
-            aria-label="Sign out"
-            title="Sign out"
+            aria-label="Sair"
+            title="Sair"
             className="flex items-center justify-center size-8 rounded-full hover:bg-accent transition"
           >
             <LogOut className="size-4" />
           </button>
           <button
             onClick={() => setShowReport(true)}
-            aria-label="Build report"
+            aria-label="Criar relatório"
             className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 text-xs font-medium bg-foreground text-background rounded-full hover:bg-foreground/90 transition active:scale-95"
           >
-            <FileDown className="size-3.5" /> <span className="hidden lg:inline">Build Report</span>
+            <FileDown className="size-3.5" /> <span className="hidden lg:inline">Criar Relatório</span>
           </button>
         </div>
       </nav>
@@ -1399,9 +1399,9 @@ function Calculator({
         },
       });
       persist({ ai_summary: r.summary, ai_talking_points: r.talking_points });
-      toast.success("Executive summary generated");
+      toast.success("Resumo executivo gerado");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "AI failed");
+      toast.error(e instanceof Error ? e.message : "Falha na IA");
     } finally {
       setGenLoading(false);
     }
@@ -1416,10 +1416,10 @@ function Calculator({
             className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tighter"
             style={{ fontFamily: 'Urbanist, system-ui, -apple-system, sans-serif' }}
           >
-            Calculate your <span className="text-primary">potential</span>
+            Calcule seu <span className="text-primary">potencial</span>
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground text-balance">
-            Estimate the return on investment for your solution. Adjust parameters to see projected savings.
+            Estime o retorno do investimento da sua solução. Ajuste os parâmetros para ver a economia projetada.
           </p>
         </header>
 
@@ -1429,7 +1429,7 @@ function Calculator({
           <div className="space-y-6 min-w-0">
             <div className="rounded-2xl bg-card ring-1 ring-black/5 p-6 sm:p-7 shadow-card">
               <FieldSection
-                title="Investment Parameters"
+                title="Parâmetros de Investimento"
                 fields={template.parameters}
                 allFields={[...template.parameters, ...template.returns]}
                 formulas={template.formulas}
@@ -1443,7 +1443,7 @@ function Calculator({
             </div>
             <div className="rounded-2xl bg-card ring-1 ring-black/5 p-6 sm:p-7 shadow-card">
               <FieldSection
-                title="Projected Returns"
+                title="Retornos Projetados"
                 fields={template.returns}
                 allFields={[...template.parameters, ...template.returns]}
                 formulas={template.formulas}
@@ -1486,7 +1486,7 @@ function Calculator({
                 ) : (
                   <Wand2 className="size-3" />
                 )}
-                {deal.ai_summary ? "Regenerate" : "Generate"}
+                {deal.ai_summary ? "Regenerar" : "Gerar"}
               </button>
             </div>
             <div className="text-sm leading-relaxed text-muted-foreground text-pretty min-h-[6rem]">
@@ -1673,12 +1673,12 @@ function ResultsCard({
           </span>
           <span className="text-3xl sm:text-4xl font-bold ml-1" style={{ color: "var(--metric-accent)" }}>%</span>
         </div>
-        <p className="mt-1 text-xs text-white/55">Total Return on Investment</p>
+        <p className="mt-1 text-xs text-white/55">Retorno Total do Investimento</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-3">
         <div className="rounded-xl bg-white/[0.04] ring-1 ring-white/[0.06] p-4">
-          <span className="font-mono text-[9px] uppercase tracking-wider text-white/50">Annual Savings</span>
+          <span className="font-mono text-[9px] uppercase tracking-wider text-white/50">Economia Anual</span>
           <p className="mt-1.5 text-xl font-bold tabular-nums" style={{ color: "var(--metric-accent)" }}>
             <AnimatedNumber
               value={computed.annualGain}
@@ -1687,7 +1687,7 @@ function ResultsCard({
           </p>
         </div>
         <div className="rounded-xl bg-white/[0.04] ring-1 ring-white/[0.06] p-4">
-          <span className="font-mono text-[9px] uppercase tracking-wider text-white/50">3-Year Value</span>
+          <span className="font-mono text-[9px] uppercase tracking-wider text-white/50">Valor em 3 Anos</span>
           <p className="mt-1.5 text-xl font-bold tabular-nums text-white">
             <AnimatedNumber
               value={computed.threeYearValue}
@@ -1699,7 +1699,7 @@ function ResultsCard({
 
       <div className="rounded-xl bg-white/[0.04] ring-1 ring-white/[0.06] p-4 mb-5 flex items-center justify-between">
         <div>
-          <span className="font-mono text-[9px] uppercase tracking-wider text-white/50">Payback Period</span>
+          <span className="font-mono text-[9px] uppercase tracking-wider text-white/50">Período de Payback</span>
           <p className="mt-1.5 text-xl font-bold tabular-nums text-white">{paybackLabel}</p>
         </div>
         {isFast && (
@@ -1719,7 +1719,7 @@ function ResultsCard({
           <div className="h-full" style={{ width: `${100 - costPct}%`, background: "var(--metric-accent)" }} />
         </div>
         <p className="mt-4 text-center text-[11px] text-white/45 italic">
-          Expected outcome based on typical implementation
+          Resultado esperado com base em uma implementação típica
         </p>
       </div>
     </div>
@@ -1783,7 +1783,7 @@ function FieldSection({
     }
   };
   const addField = () => {
-    const label = kind === "parameter" ? "New parameter" : "New return";
+    const label = kind === "parameter" ? "Novo parâmetro" : "Novo retorno";
     const key = slugifyKey(label, [...allFields.map((f) => f.key), ...formulas.map((f) => f.key)]);
     const newField: Field = {
       key,
@@ -2010,7 +2010,7 @@ function FieldControl({
           <input
             value={field.label}
             onChange={(e) => onLabelChange(e.target.value)}
-            title={field.help || "Click to rename"}
+            title={field.help || "Clique para renomear"}
             className="text-[13px] font-mono uppercase text-foreground tracking-wider bg-transparent border border-transparent rounded px-1 -mx-1 hover:border-border focus:border-primary focus:outline-none transition-colors min-w-0 flex-1 truncate"
           />
           {isComputed && (
@@ -2030,7 +2030,7 @@ function FieldControl({
             <PopoverTrigger asChild>
               <button
                 type="button"
-                aria-label="Field settings"
+                aria-label="Configurações do campo"
                 className="opacity-0 group-hover:opacity-100 focus:opacity-100 data-[state=open]:opacity-100 text-muted-foreground/60 hover:text-foreground transition shrink-0"
               >
                 <SettingsIcon className="size-3" strokeWidth={2.5} />
@@ -2210,7 +2210,7 @@ function FieldControl({
           <button
             type="button"
             onClick={onRemove}
-            aria-label="Remove field"
+            aria-label="Remover campo"
             className="opacity-0 group-hover:opacity-100 focus:opacity-100 text-muted-foreground/60 hover:text-destructive transition shrink-0"
           >
             <X className="size-3" strokeWidth={2.5} />
@@ -2237,7 +2237,7 @@ function FieldControl({
                 tabIndex={-1}
                 onClick={() => onChange(Math.min(max, value + step))}
                 className="grid place-items-center w-5 h-3.5 text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="Increase"
+                aria-label="Aumentar"
               >
                 <ChevronUp className="size-3" strokeWidth={2.5} />
               </button>
@@ -2247,7 +2247,7 @@ function FieldControl({
                 tabIndex={-1}
                 onClick={() => onChange(Math.max(min, value - step))}
                 className="grid place-items-center w-5 h-3.5 text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
-                aria-label="Decrease"
+                aria-label="Diminuir"
               >
                 <ChevronDown className="size-3" strokeWidth={2.5} />
               </button>
@@ -2316,9 +2316,9 @@ function BrandingSection({ deal, persist }: { deal: Deal; persist: (p: Partial<D
       if (error) throw error;
       const { data } = supabase.storage.from("logos").getPublicUrl(path);
       persist({ prospect_logo_url: data.publicUrl });
-      toast.success("Logo uploaded");
+      toast.success("Logo enviada");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed");
+      toast.error(e instanceof Error ? e.message : "Falha no upload");
     } finally {
       setUploading(false);
     }
@@ -2347,7 +2347,7 @@ function BrandingSection({ deal, persist }: { deal: Deal; persist: (p: Partial<D
         <input
           value={deal.prospect_company || ""}
           onChange={(e) => persist({ prospect_company: e.target.value })}
-          placeholder="Acme Global"
+          placeholder="Empresa Global"
           className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-none"
         />
       </div>
@@ -2361,7 +2361,7 @@ function BrandingSection({ deal, persist }: { deal: Deal; persist: (p: Partial<D
           ) : (
             <ImagePlus className="size-3.5" />
           )}
-          {deal.prospect_logo_url ? "Replace logo" : "Upload logo (PNG/SVG, ≤2MB)"}
+          {deal.prospect_logo_url ? "Substituir logo" : "Enviar logo (PNG/SVG, ≤2MB)"}
           <input
             type="file"
             accept="image/*"
@@ -2447,8 +2447,8 @@ function CustomBrandPicker({
       <PopoverTrigger asChild>
         <button
           type="button"
-          title="Custom color"
-          aria-label="Custom color"
+          title="Cor personalizada"
+          aria-label="Cor personalizada"
           className={cn(
             "group flex items-center gap-2 rounded-full pl-1 pr-3 py-1 border transition",
             active ? "border-foreground/40 bg-accent" : "border-border hover:border-foreground/20",
@@ -2591,7 +2591,7 @@ function ResearchPanel({
 
   const run = async () => {
     if (!query.trim()) {
-      toast.error("Enter a URL or company description");
+      toast.error("Digite uma URL ou descrição da empresa");
       return;
     }
     setLoading(true);
@@ -2616,7 +2616,7 @@ function ResearchPanel({
         return;
       }
       const productWithPitch = pitch.trim()
-        ? `${freshProduct}\n\nSPECIFIC PITCH FOR THIS PROSPECT:\n${pitch.trim()}`
+        ? `${freshProduct}\n\nPITCH ESPECÍFICO PARA ESTE PROSPECT:\n${pitch.trim()}`
         : freshProduct;
       const [r, brandResult] = await Promise.allSettled([
         enrichFn({
@@ -2625,7 +2625,7 @@ function ResearchPanel({
         brandFn({ data: { url: query.trim() } }),
       ]);
       if (r.status !== "fulfilled") {
-        throw r.reason instanceof Error ? r.reason : new Error("Research failed");
+        throw r.reason instanceof Error ? r.reason : new Error("Falha na pesquisa");
       }
       const res = r.value as ResearchResult;
       setResult(res);
@@ -2679,9 +2679,9 @@ function ResearchPanel({
           persist({ prospect_company: guess.charAt(0).toUpperCase() + guess.slice(1) });
         }
       }
-      toast.success("Intel ready");
+      toast.success("Inteligência pronta");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Research failed");
+      toast.error(e instanceof Error ? e.message : "Falha na pesquisa");
     } finally {
       setLoading(false);
     }
@@ -2696,7 +2696,7 @@ function ResearchPanel({
       {!inSheet && (
         <button
           onClick={onToggle}
-          aria-label={collapsed ? "Expand company research" : "Collapse company research"}
+          aria-label={collapsed ? "Expandir pesquisa da empresa" : "Recolher pesquisa da empresa"}
           className="group h-full w-11 shrink-0 border-r border-border flex flex-col items-center justify-between py-3 hover:bg-muted/40 transition-colors"
         >
           <motion.div
@@ -2713,7 +2713,7 @@ function ResearchPanel({
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1], delay: collapsed ? 0.25 : 0 }}
               className="rotate-180 [writing-mode:vertical-rl] font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground group-hover:text-foreground transition-colors"
             >
-              Company Research
+              Pesquisa da Empresa
             </motion.div>
           </div>
 
@@ -2741,7 +2741,7 @@ function ResearchPanel({
         <div className={cn("p-4 border-b border-border space-y-3 shrink-0", inSheet && "pr-12")}>
           <div className="flex items-center justify-between">
             <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-              Company Research
+              Pesquisa da Empresa
             </span>
             <div className="flex bg-muted rounded p-0.5">
               {(["fast", "deep"] as const).map((m) => (
@@ -2766,21 +2766,21 @@ function ResearchPanel({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && run()}
-              placeholder="https://acme.com or describe…"
+              placeholder="https://acme.com ou descreva…"
               className="w-full bg-background border border-border rounded-lg pl-8 pr-3 py-2 text-xs focus:ring-1 focus:ring-primary focus:outline-none"
             />
           </div>
           <div className="space-y-1">
             <label className="font-mono text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
-              Pitch for this prospect{" "}
+              Pitch para este prospect{" "}
               <span className="text-muted-foreground/60 font-normal normal-case tracking-normal">
-                — optional
+                — opcional
               </span>
             </label>
             <textarea
               value={pitch}
               onChange={(e) => setPitch(e.target.value)}
-              placeholder="What you're selling them and why it fits — e.g. 'Replace their 3 disconnected internal tools with one customizable platform their ops team can edit themselves.'"
+              placeholder="O que você está vendendo e por que faz sentido — ex.: 'Substituir suas 3 ferramentas internas desconectadas por uma plataforma customizável que o time de operações pode editar sozinho.'"
               rows={3}
               className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs leading-relaxed focus:ring-1 focus:ring-primary focus:outline-none resize-none"
             />
@@ -2796,7 +2796,7 @@ function ResearchPanel({
             ) : (
               <Search className="size-3.5" />
             )}
-            {loading ? "Researching" : `Run ${mode === "deep" ? "deep" : "fast"} research`}
+            {loading ? "Pesquisando" : `Pesquisa ${mode === "deep" ? "profunda" : "rápida"}`}
           </button>
         </div>
 
@@ -2806,17 +2806,17 @@ function ResearchPanel({
               <div className="space-y-2">
                 <Search className="size-6 mx-auto text-muted-foreground/40" />
                 <p className="text-xs text-muted-foreground">
-                  Drop a company URL or notes to surface pain points and tailored angles.
+                  Adicione uma URL ou notas para descobrir dores e ângulos personalizados.
                 </p>
               </div>
             </div>
           )}
           {result && (
             <>
-              <ResearchBlock label="Snapshot" delay={0}>
+              <ResearchBlock label="Resumo" delay={0}>
                 <p className="text-xs leading-relaxed text-foreground/85">{result.snapshot}</p>
               </ResearchBlock>
-              <ResearchBlock label="Pain Points" delay={0.05}>
+              <ResearchBlock label="Dores" delay={0.05}>
                 <ul className="space-y-2">
                   {result.pain_points?.map((p, i) => (
                     <li key={i} className="flex gap-2 text-xs">
@@ -2826,7 +2826,7 @@ function ResearchPanel({
                   ))}
                 </ul>
               </ResearchBlock>
-              <ResearchBlock label="Why We Fit" delay={0.1}>
+              <ResearchBlock label="Por Que Encaixamos" delay={0.1}>
                 <ul className="space-y-2">
                   {result.why_we_fit?.map((p, i) => (
                     <li
@@ -2838,7 +2838,7 @@ function ResearchPanel({
                   ))}
                 </ul>
               </ResearchBlock>
-              <ResearchBlock label="Talking Points" delay={0.15}>
+              <ResearchBlock label="Pontos de Conversa" delay={0.15}>
                 <ul className="space-y-2">
                   {result.talking_points?.map((p, i) => (
                     <li key={i} className="flex gap-2 text-xs">
@@ -2849,7 +2849,7 @@ function ResearchPanel({
                 </ul>
               </ResearchBlock>
               {result.recent_news && result.recent_news.length > 0 && (
-                <ResearchBlock label="Recent Signals" delay={0.2}>
+                <ResearchBlock label="Sinais Recentes" delay={0.2}>
                   <ul className="space-y-2">
                     {result.recent_news.map((n, i) => (
                       <li key={i} className="text-[11px] italic text-muted-foreground">
@@ -2866,8 +2866,8 @@ function ResearchPanel({
         {/* Hint about settings */}
         {(!myCompany || !myProduct) && (
           <div className="p-3 bg-muted/40 border-t border-border text-[10px] text-muted-foreground">
-            Tip: set your company + product in <span className="font-bold">Settings</span> for
-            sharper "Why We Fit" angles.
+            Dica: defina sua empresa + produto em <span className="font-bold">Configurações</span> para
+            ângulos mais afiados de "Por Que Encaixamos".
           </div>
         )}
       </motion.div>
@@ -2952,7 +2952,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
       const { data } = supabase.storage.from("logos").getPublicUrl(path);
       setSettings((s) => ({ ...s, brand_logo_url: data.publicUrl }));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed");
+      toast.error(e instanceof Error ? e.message : "Falha no upload");
     } finally {
       setUploading(false);
     }
@@ -2970,7 +2970,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
     if (settings.id) await supabase.from("user_settings").update(payload).eq("id", settings.id);
     else await supabase.from("user_settings").insert(payload);
     setSaving(false);
-    toast.success("Settings saved");
+    toast.success("Configurações salvas");
     onClose();
   };
 
@@ -3010,7 +3010,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
             <input
               value={settings.company_name}
               onChange={(e) => setSettings((s) => ({ ...s, company_name: e.target.value }))}
-              placeholder="Acme Inc"
+              placeholder="Empresa Ltda"
               className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-none"
             />
           </div>
@@ -3026,7 +3026,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
               className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-none resize-none"
             />
             <p className="text-[10px] text-muted-foreground">
-              Used by AI to tailor "Why We Fit" angles per prospect.
+              Usado pela IA para personalizar os ângulos de "Por Que Encaixamos" por prospect.
             </p>
           </div>
         </div>
@@ -3090,7 +3090,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
                   ) : (
                     <ImagePlus className="size-3" />
                   )}
-                  {settings.brand_logo_url ? "Replace logo" : "Upload logo"}
+                  {settings.brand_logo_url ? "Substituir logo" : "Enviar logo"}
                 </button>
                 {settings.brand_logo_url && (
                   <button
@@ -3136,7 +3136,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
             <label className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
               Tagline{" "}
               <span className="text-muted-foreground/60 font-normal normal-case tracking-normal">
-                — optional
+                — opcional
               </span>
             </label>
             <input
@@ -3156,14 +3156,14 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
             onClick={onClose}
             className="px-3 py-1.5 text-xs font-medium rounded-md hover:bg-muted"
           >
-            Cancel
+            Cancelar
           </button>
           <button
             onClick={save}
             disabled={saving}
             className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-foreground text-background rounded-md hover:bg-foreground/90 active:scale-95 disabled:opacity-60"
           >
-            {saving && <Loader2 className="size-3 animate-spin" />} Save
+            {saving && <Loader2 className="size-3 animate-spin" />} Salvar
           </button>
         </div>
       </motion.div>
@@ -3208,7 +3208,7 @@ function StartHereGuide({ onClose }: { onClose: () => void }) {
     <div className="h-full flex flex-col">
       <div className="px-6 pt-6 pb-4 border-b border-border">
         <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
-          <HelpCircle className="size-3" /> Start here
+          <HelpCircle className="size-3" /> Comece aqui
         </div>
         <h2 className="mt-2 text-xl font-bold tracking-tight text-balance">
           Build a branded ROI business case in five minutes
@@ -3233,38 +3233,38 @@ function StartHereGuide({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="flex-1 px-6 pb-6">
-        <Step n={1} icon={LayoutTemplate} title="Pick a template">
+        <Step n={1} icon={LayoutTemplate} title="Escolha um modelo">
           <p>
             Top-left of the nav, click the template name to swap between built-ins (Cloud Migration,
             Automation, etc.). Each template defines the input fields, formulas, and report sections
             you'll work with.
           </p>
         </Step>
-        <Step n={2} icon={Search} title="Research the prospect with AI">
+        <Step n={2} icon={Search} title="Pesquise o prospect com IA">
           <p>
             Open the <span className="font-medium text-foreground">Research</span> panel (right side
             on desktop, button in the nav on smaller screens). Paste a company URL or name — the AI
             pulls company facts, suggests the best template, and can prefill calculator inputs.
           </p>
         </Step>
-        <Step n={3} icon={Palette} title="Pull their branding">
+        <Step n={3} icon={Palette} title="Puxe a identidade visual">
           <p>
             In Research, click <span className="font-medium text-foreground">Pull branding</span> to
             grab the prospect's logo and brand colors from their site. These flow into the report
             theme so the deck feels native to them — not to you.
           </p>
         </Step>
-        <Step n={4} icon={Sigma} title="Tune the numbers">
+        <Step n={4} icon={Sigma} title="Ajuste os números">
           <p>
             Edit any input on the left. Results recompute live. Use the{" "}
-            <span className="font-medium text-foreground">Conservative / Expected / Optimistic</span>{" "}
+            <span className="font-medium text-foreground">Conservador / Esperado / Otimista</span>{" "}
             tabs to stress-test the case. Formulas live in the template — you can save a customized
-            version via <span className="font-mono text-[11.5px]">Save current as template…</span>.
+            version via <span className="font-mono text-[11.5px]">Salvar atual como modelo…</span>.
           </p>
         </Step>
-        <Step n={5} icon={FileDown} title="Build and share the report">
+        <Step n={5} icon={FileDown} title="Crie e compartilhe o relatório">
           <p>
-            Click <span className="font-medium text-foreground">Build Report</span> (top right) to
+            Click <span className="font-medium text-foreground">Criar Relatório</span> (top right) to
             open the editor. Tweak copy with the AI rewrite tool, then export a branded PDF or copy
             a <span className="font-mono text-[11.5px]">/share/&lt;dealId&gt;</span> link for the
             prospect.
@@ -3282,7 +3282,7 @@ function StartHereGuide({ onClose }: { onClose: () => void }) {
             </li>
             <li className="flex gap-2">
               <ListChecks className="size-3.5 mt-0.5 shrink-0 text-foreground/60" />
-              Your own logo and company name live in <span className="font-medium text-foreground">Settings</span> (gear icon) and appear in every report.
+              Your own logo and company name live in <span className="font-medium text-foreground">Configurações</span> (gear icon) and appear in every report.
             </li>
             <li className="flex gap-2">
               <ListChecks className="size-3.5 mt-0.5 shrink-0 text-foreground/60" />
@@ -3463,34 +3463,34 @@ type BlockType =
 
 const PRESETS: Record<BlockType, { label: string; instruction: string }[]> = {
   headline: [
-    { label: "Punchier", instruction: "Make it punchier and more confident. Max 10 words." },
+    { label: "Mais impactante", instruction: "Make it punchier and more confident. Max 10 words." },
     { label: "Numbers-first", instruction: "Lead with the headline ROI number." },
-    { label: "More specific", instruction: "Make it more specific to the prospect." },
+    { label: "Mais específico", instruction: "Make it more specific to the prospect." },
   ],
   intro: [
-    { label: "Shorter", instruction: "Cut to 1 tight sentence." },
-    { label: "More technical", instruction: "Make the tone more technical and precise." },
-    { label: "Warmer", instruction: "Warmer, more human tone — still professional." },
+    { label: "Mais curto", instruction: "Cut to 1 tight sentence." },
+    { label: "Mais técnico", instruction: "Make the tone more technical and precise." },
+    { label: "Mais caloroso", instruction: "Warmer, more human tone — still professional." },
   ],
   exec_summary: [
-    { label: "More concise", instruction: "Cut to half the length. Keep all key numbers." },
-    { label: "Lead with impact", instruction: "Restructure to lead with business impact, not setup." },
+    { label: "Mais conciso", instruction: "Cut to half the length. Keep all key numbers." },
+    { label: "Comece pelo impacto", instruction: "Restructure to lead with business impact, not setup." },
     { label: "CFO-ready", instruction: "Rewrite for a CFO audience — finance language, payback-focused." },
   ],
   why_we_fit_item: [
-    { label: "More specific", instruction: "Make it more specific to the prospect's context." },
-    { label: "Shorter", instruction: "Cut to one tight sentence." },
-    { label: "Add a metric", instruction: "Include a concrete metric or before/after." },
+    { label: "Mais específico", instruction: "Make it more specific to the prospect's context." },
+    { label: "Mais curto", instruction: "Cut to one tight sentence." },
+    { label: "Adicionar métrica", instruction: "Include a concrete metric or before/after." },
   ],
   talking_point: [
-    { label: "As a question", instruction: "Reframe as a sharp discovery question." },
-    { label: "Shorter", instruction: "Cut to a single tight sentence." },
-    { label: "More specific", instruction: "Tie it to the prospect's industry or scale." },
+    { label: "Como pergunta", instruction: "Reframe as a sharp discovery question." },
+    { label: "Mais curto", instruction: "Cut to a single tight sentence." },
+    { label: "Mais específico", instruction: "Tie it to the prospect's industry or scale." },
   ],
   cta: [
-    { label: "More urgent", instruction: "Add urgency without being pushy." },
-    { label: "Soft ask", instruction: "Make it a softer, lower-friction next step." },
-    { label: "Concrete", instruction: "Make the next step very concrete — name a meeting type and length." },
+    { label: "Mais urgente", instruction: "Add urgency without being pushy." },
+    { label: "Pedido suave", instruction: "Make it a softer, lower-friction next step." },
+    { label: "Concreto", instruction: "Make the next step very concrete — name a meeting type and length." },
   ],
 };
 
@@ -3530,9 +3530,9 @@ function AIAssist({
       onApply(r.text);
       setOpen(false);
       setPrompt("");
-      toast.success("Rewritten");
+      toast.success("Reescrito");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "AI rewrite failed");
+      toast.error(e instanceof Error ? e.message : "Falha ao reescrever com IA");
     } finally {
       setBusy(false);
     }
@@ -3543,7 +3543,7 @@ function AIAssist({
       <PopoverTrigger asChild>
         <button
           type="button"
-          aria-label="AI rewrite"
+          aria-label="Reescrever com IA"
           className={cn(
             "size-6 grid place-items-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
             className,
@@ -3626,13 +3626,13 @@ function ShareView({
   const url = isLocal ? "" : buildShareUrl(dealId);
   const copy = async () => {
     if (!url) {
-      toast.error("Save the deal first to share it.");
+      toast.error("Salve o negócio primeiro para compartilhar.");
       return;
     }
     try {
       if (navigator.clipboard?.writeText && window.isSecureContext) {
         await navigator.clipboard.writeText(url);
-        toast.success("Link copied");
+        toast.success("Link copiado");
         return;
       }
       throw new Error("clipboard unavailable");
@@ -3651,18 +3651,18 @@ function ShareView({
         const ok = document.execCommand("copy");
         document.body.removeChild(ta);
         if (ok) {
-          toast.success("Link copied");
+          toast.success("Link copiado");
           return;
         }
       } catch {
         // fall through
       }
-      toast.message("Copy this link", { description: url });
+      toast.message("Copie este link", { description: url });
     }
   };
   const open = () => {
     if (!url) {
-      toast.error("Save the deal first to share it.");
+      toast.error("Salve o negócio primeiro para compartilhar.");
       return;
     }
     window.open(url, "_blank", "noopener,noreferrer");
@@ -3693,7 +3693,7 @@ function ShareView({
 
         {isLocal ? (
           <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            Save the deal once to generate a shareable link.
+            Salve o negócio uma vez para gerar um link compartilhável.
           </div>
         ) : (
           <>
@@ -3901,7 +3901,7 @@ function PdfPreview({
     <div className="space-y-6 pb-6" style={canvasStyle}>
       <div className="max-w-[640px] mx-auto flex items-center justify-between text-xs text-muted-foreground">
         <span className="font-mono uppercase tracking-wider">
-          {editable ? "Edit in place · what you see is what exports" : "Pages match the exported PDF"}
+          {editable ? "Edite no local · o que você vê é o que exporta" : "As páginas correspondem ao PDF exportado"}
         </span>
         {editable && (
           <span className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider">
@@ -3968,7 +3968,7 @@ function PdfPreview({
                         className="text-base sm:text-lg font-bold tracking-tight text-neutral-900 truncate"
                         style={brandHeading ? { fontFamily: "var(--report-heading-font)" } : undefined}
                       >
-                        {brand.company_name || "Your Company"}
+                        {brand.company_name || "Sua Empresa"}
                       </span>
                       {brand.brand_logo_url && (
                         <img
@@ -3997,8 +3997,8 @@ function PdfPreview({
                     <AutoTextarea
                       value={data.headline}
                       onChange={(e) => edit!.update({ headline: e.target.value })}
-                      ariaLabel="Headline"
-                      placeholder="Headline"
+                      ariaLabel="Título"
+                      placeholder="Título"
                       className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight"
                       style={brandHeading ? { fontFamily: "var(--report-heading-font)" } : undefined}
                     />
@@ -4023,8 +4023,8 @@ function PdfPreview({
                     <AutoTextarea
                       value={data.intro}
                       onChange={(e) => edit!.update({ intro: e.target.value })}
-                      ariaLabel="Intro"
-                      placeholder="Short intro shown under the headline"
+                      ariaLabel="Introdução"
+                      placeholder="Breve introdução exibida abaixo do título"
                       className="text-xs sm:text-sm text-neutral-600 leading-relaxed"
                     />
                     <AIAssist
@@ -4081,9 +4081,9 @@ function PdfPreview({
               <SectionLabel accent={accent}>The Numbers</SectionLabel>
               <div className="grid grid-cols-2 gap-3 mt-4">
                 {[
-                  ["Annual Investment", formatCurrency(computed.annualCost)],
-                  ["Annual Gain", formatCurrency(computed.annualGain)],
-                  ["3-Year Value", formatCurrency(computed.threeYearValue)],
+                  ["Investimento Anual", formatCurrency(computed.annualCost)],
+                  ["Ganho Anual", formatCurrency(computed.annualGain)],
+                  ["Valor em 3 Anos", formatCurrency(computed.threeYearValue)],
                   [
                     "Payback",
                     isFinite(computed.paybackMonths)
@@ -4113,7 +4113,7 @@ function PdfPreview({
                     <AutoTextarea
                       value={data.exec_summary}
                       onChange={(e) => edit!.update({ exec_summary: e.target.value })}
-                      ariaLabel="Executive summary"
+                      ariaLabel="Resumo executivo"
                       placeholder="A 2–4 sentence summary the exec will read first"
                       className="text-[11px] leading-relaxed text-neutral-700"
                     />
@@ -4148,13 +4148,13 @@ function PdfPreview({
               style={innerStyle}
             >
               <FieldsBlock
-                title="Investment parameters"
+                title="Parâmetros de investimento"
                 fields={template.parameters}
                 values={deal.values || {}}
                 accent={accent}
               />
               <FieldsBlock
-                title="Projected returns"
+                title="Retornos projetados"
                 fields={template.returns}
                 values={deal.values || {}}
                 accent={accent}
@@ -4189,7 +4189,7 @@ function PdfPreview({
                       onClick={() => edit!.addItem("why_we_fit")}
                       className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 hover:text-neutral-900 flex items-center gap-1"
                     >
-                      <Plus className="size-3" /> Add point
+                      <Plus className="size-3" /> Adicionar ponto
                     </button>
                   )}
                 </div>
@@ -4228,7 +4228,7 @@ function PdfPreview({
                             <button
                               type="button"
                               onClick={() => edit!.removeItem("why_we_fit", i)}
-                              aria-label="Remove point"
+                              aria-label="Remover ponto"
                               className="size-6 grid place-items-center rounded-md text-neutral-400 hover:text-red-600 hover:bg-red-50 transition opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
                             >
                               <Trash2 className="size-3.5" />
@@ -4275,7 +4275,7 @@ function PdfPreview({
                       onClick={() => edit!.addItem("talking_points")}
                       className="text-[10px] font-mono uppercase tracking-wider text-neutral-500 hover:text-neutral-900 flex items-center gap-1"
                     >
-                      <Plus className="size-3" /> Add point
+                      <Plus className="size-3" /> Adicionar ponto
                     </button>
                   )}
                 </div>
@@ -4312,7 +4312,7 @@ function PdfPreview({
                             <button
                               type="button"
                               onClick={() => edit!.removeItem("talking_points", i)}
-                              aria-label="Remove point"
+                              aria-label="Remover ponto"
                               className="size-6 grid place-items-center rounded-md text-neutral-400 hover:text-red-600 hover:bg-red-50 transition opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
                             >
                               <Trash2 className="size-3.5" />
@@ -4349,7 +4349,7 @@ function PdfPreview({
                         <AutoTextarea
                           value={data.cta}
                           onChange={(e) => edit!.update({ cta: e.target.value })}
-                          ariaLabel="Call to action"
+                          ariaLabel="Chamada para ação"
                           placeholder="Propose the next concrete step…"
                           className="text-sm font-bold mt-2 leading-snug text-white placeholder:text-white/60"
                         />
@@ -4565,16 +4565,16 @@ function ReportEditor({
   // Save the currently-edited report as a reusable template
   const saveAsTemplate = async () => {
     if (!data) return;
-    const name = window.prompt("Name this report template", "My report template");
+    const name = window.prompt("Nomeie este modelo de relatório", "Meu modelo de relatório");
     if (!name) return;
     const { error } = await supabase
       .from("report_templates")
       .insert({ name: name.trim(), content: data as never });
     if (error) {
-      toast.error("Could not save template");
+      toast.error("Não foi possível salvar o modelo");
       return;
     }
-    toast.success("Report template saved");
+    toast.success("Modelo de relatório salvo");
     refetchReportTemplates();
     setShowTemplates(false);
   };
@@ -4589,7 +4589,7 @@ function ReportEditor({
   const deleteTemplate = async (id: string) => {
     const { error } = await supabase.from("report_templates").delete().eq("id", id);
     if (error) {
-      toast.error("Could not delete template");
+      toast.error("Não foi possível excluir o modelo");
       return;
     }
     refetchReportTemplates();
@@ -4635,12 +4635,12 @@ function ReportEditor({
         deal.prospect_logo_url ? loadImageForPdf(deal.prospect_logo_url) : Promise.resolve(null),
       ]);
 
-      // Header eyebrow ("PROJECTED ROI REPORT") in accent color.
+      // Header eyebrow ("RELATÓRIO DE ROI PROJETADO") in accent color.
       const headerTop = 64;
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(8);
       pdf.setTextColor(br, bg, bb);
-      pdf.text("PROJECTED ROI REPORT", M, headerTop, { charSpace: 1.6 });
+      pdf.text("RELATÓRIO DE ROI PROJETADO", M, headerTop, { charSpace: 1.6 });
 
       // Header row: "Prepared for" + prospect | divider | "Presented by" + us.
       const rowY = headerTop + 22;
@@ -4653,8 +4653,8 @@ function ReportEditor({
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(7);
       pdf.setTextColor(160);
-      pdf.text("PREPARED FOR", leftX, rowY, { charSpace: 1.3 });
-      pdf.text("PRESENTED BY", rightX + colW, rowY, {
+      pdf.text("PREPARADO PARA", leftX, rowY, { charSpace: 1.3 });
+      pdf.text("APRESENTADO POR", rightX + colW, rowY, {
         align: "right",
         charSpace: 1.3,
       });
@@ -4710,7 +4710,7 @@ function ReportEditor({
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(14);
       pdf.setTextColor(20);
-      pdf.text(brand.company_name || "Your Company", rightCursorX, labelY, {
+      pdf.text(brand.company_name || "Sua Empresa", rightCursorX, labelY, {
         align: "right",
       });
 
@@ -4737,7 +4737,7 @@ function ReportEditor({
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(9);
       pdf.setTextColor(br, bg, bb);
-      pdf.text("BUSINESS CASE", M, titleY, { charSpace: 1.6 });
+      pdf.text("CASE DE NEGÓCIO", M, titleY, { charSpace: 1.6 });
 
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(30);
@@ -4792,7 +4792,7 @@ function ReportEditor({
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(br, bg, bb);
-      pdf.text("THE NUMBERS", M, y);
+      pdf.text("OS NÚMEROS", M, y);
       y += 8;
       pdf.setDrawColor(br, bg, bb);
       pdf.setLineWidth(1.5);
@@ -4801,8 +4801,8 @@ function ReportEditor({
       y += 24;
 
       const cards: Array<[string, string]> = [
-        ["ANNUAL INVESTMENT", formatCurrency(computed.annualCost)],
-        ["ANNUAL GAIN", formatCurrency(computed.annualGain)],
+        ["INVESTIMENTO ANUAL", formatCurrency(computed.annualCost)],
+        ["GANHO ANUAL", formatCurrency(computed.annualGain)],
         ["3-YEAR VALUE", formatCurrency(computed.threeYearValue)],
         [
           "PAYBACK",
@@ -4838,7 +4838,7 @@ function ReportEditor({
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.setTextColor(br, bg, bb);
-      pdf.text("EXECUTIVE SUMMARY", M, y);
+      pdf.text("RESUMO EXECUTIVO", M, y);
       y += 8;
       pdf.setDrawColor(br, bg, bb);
       pdf.setLineWidth(1.5);
@@ -4897,8 +4897,8 @@ function ReportEditor({
       pdf.addPage();
       y = 72;
       drawChrome();
-      renderSection("Investment parameters", template.parameters);
-      renderSection("Projected returns", template.returns);
+      renderSection("Parâmetros de investimento", template.parameters);
+      renderSection("Retornos projetados", template.returns);
 
       // ── WHY WE FIT ──
       if (data.why_we_fit.filter((s) => s.trim()).length) {
@@ -4908,7 +4908,7 @@ function ReportEditor({
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(10);
         pdf.setTextColor(br, bg, bb);
-        pdf.text("WHY THIS FITS", M, y);
+        pdf.text("POR QUE ENCAIXA", M, y);
         y += 8;
         pdf.setDrawColor(br, bg, bb);
         pdf.setLineWidth(1.5);
@@ -4955,7 +4955,7 @@ function ReportEditor({
           pdf.setFont("helvetica", "bold");
           pdf.setFontSize(10);
           pdf.setTextColor(br, bg, bb);
-          pdf.text("KEY DISCUSSION POINTS", M, y);
+          pdf.text("PONTOS-CHAVE DE DISCUSSÃO", M, y);
           y += 8;
           pdf.setDrawColor(br, bg, bb);
           pdf.setLineWidth(1.5);
@@ -4996,7 +4996,7 @@ function ReportEditor({
           pdf.setFont("helvetica", "bold");
           pdf.setFontSize(9);
           pdf.setTextColor(255, 255, 255);
-          pdf.text("NEXT STEP", M + 24, y + 32);
+          pdf.text("PRÓXIMO PASSO", M + 24, y + 32);
           pdf.setFont("helvetica", "bold");
           pdf.setFontSize(14);
           pdf.text(ctaLines, M + 24, y + 60, { lineHeightFactor: 1.5 });
@@ -5082,7 +5082,7 @@ function ReportEditor({
                 <span className="hidden sm:inline">
                   {view === "edit"
                     ? "Edit in place · what you see is what exports"
-                    : "Share with prospect"}
+                    : "Compartilhar com prospect"}
                 </span>
                 <span className="sm:hidden">
                   {view === "edit" ? "Edit" : "Share"}
@@ -5118,7 +5118,7 @@ function ReportEditor({
                   refetchReportTemplates();
                   setShowTemplates((v) => !v);
                 }}
-                aria-label="Report templates"
+                aria-label="Modelos de relatório"
                 className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 text-xs font-medium rounded-md border border-border hover:bg-accent transition"
               >
                 <BookMarked className="size-3.5" />
@@ -5170,7 +5170,7 @@ function ReportEditor({
                                     deleteTemplate(t.id);
                                   }
                                 }}
-                                aria-label="Delete template"
+                                aria-label="Excluir modelo"
                                 className="opacity-0 group-hover:opacity-100 size-6 grid place-items-center rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition"
                               >
                                 <Trash2 className="size-3.5" />
@@ -5194,7 +5194,7 @@ function ReportEditor({
             <button
               onClick={exportPDF}
               disabled={exporting}
-              aria-label="Export PDF"
+              aria-label="Exportar PDF"
               className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white rounded-md transition active:scale-95 disabled:opacity-60 hover:brightness-110 shadow-sm"
               style={{ background: accentGradient }}
             >
@@ -5208,7 +5208,7 @@ function ReportEditor({
             </button>
             <button
               onClick={onClose}
-              aria-label="Close"
+              aria-label="Fechar"
               className="size-8 grid place-items-center hover:bg-muted rounded-md"
             >
               <X className="size-4" />
@@ -5373,7 +5373,7 @@ function SaveTemplateModal({
               placeholder={
                 baseTemplate
                   ? `Custom template based on ${baseTemplate.name}`
-                  : "Describe when to use this template"
+                  : "Descreva quando usar este modelo"
               }
               className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-none resize-none"
             />
@@ -5424,7 +5424,7 @@ function SaveTemplateModal({
             onClick={onClose}
             className="px-3 py-1.5 text-xs font-medium rounded-md hover:bg-accent transition"
           >
-            Cancel
+            Cancelar
           </button>
           <button
             onClick={() =>
