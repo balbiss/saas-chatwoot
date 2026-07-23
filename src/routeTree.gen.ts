@@ -16,6 +16,7 @@ import { Route as AuthenticatedPromptRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
+import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 
@@ -53,6 +54,11 @@ const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
   path: '/agenda',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/prompt': typeof AuthenticatedPromptRoute
+  '/leads': typeof AuthenticatedLeadsRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/prompt': typeof AuthenticatedPromptRoute
+  '/leads': typeof AuthenticatedLeadsRoute
   '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
@@ -92,13 +100,14 @@ export interface FileRoutesById {
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/prompt': typeof AuthenticatedPromptRoute
+  '/_authenticated/leads': typeof AuthenticatedLeadsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/admin' | '/agenda' | '/documentos' | '/produtos' | '/prompt'
+  fullPaths: '/' | '/auth' | '/admin' | '/agenda' | '/documentos' | '/produtos' | '/prompt' | '/leads'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/admin' | '/agenda' | '/documentos' | '/produtos' | '/prompt' | '/'
+  to: '/auth' | '/admin' | '/agenda' | '/documentos' | '/produtos' | '/prompt' | '/leads' | '/'
   id:
     | '__root__'
     | '/_authenticated'
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/_authenticated/documentos'
     | '/_authenticated/produtos'
     | '/_authenticated/prompt'
+    | '/_authenticated/leads'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
@@ -169,6 +179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAgendaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/leads': {
+      id: '/_authenticated/leads'
+      path: '/leads'
+      fullPath: '/leads'
+      preLoaderRoute: typeof AuthenticatedLeadsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -191,6 +208,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedPromptRoute: typeof AuthenticatedPromptRoute
+  AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
@@ -199,6 +217,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedPromptRoute: AuthenticatedPromptRoute,
+  AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 

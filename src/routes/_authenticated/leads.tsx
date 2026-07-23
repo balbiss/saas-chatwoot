@@ -1,0 +1,111 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Download, Users } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useCompany } from "@/lib/company";
+import type { Tables } from "@/integrations/supabase/types";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { GradientButton, PageHeader } from "@/components/gradient-button";
+
+export const Route = createFileRoute("/_authenticated/leads")({ component: Page });
+
+type Lead = Tables<"leads">;
+
+async function fetchLeads(companyId: string): Promise<Lead[]> {
+  const { data, error } = await supabase
+    .from("leads")
+    .select("*")
+    .eq("company_id", companyId)
+    .order("first_contact_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+function toCsv(leads: Lead[]): string {
+  const header = "Nome,Telefone,Primeiro contato\n";
+  const rows = leads
+    .map((l) => `"${(l.name ?? "").replace(/"/g, '""')}",${l.phone},${l.first_contact_at}`)
+    .join("\n");
+  return header + rows;
+}
+
+function downloadCsv(leads: Lead[]) {
+  const blob = new Blob([toCsv(leads)], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `leads-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function Page() {
+  const { data: company } = useCompany();
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+
+  const { data: leads, isLoading } = useQuery({
+    queryKey: ["leads", company?.id],
+    queryFn: () => fetchLeads(company!.id),
+    enabled: !!company,
+  });
+
+  const filtered = useMemo(() => {
+    if (!leads) return [];
+    return leads.filter((l) => {
+      const date = l.first_contact_at.slice(0, 10);
+      if (from && date < from) return false;
+      if (to && date > to) return false;
+      return true;
+    });
+  }, [leads, from, to]);
+
+  return (
+    <div>
+      <PageHeader
+        title="Leads"
+        description="Nome e telefone de quem já entrou em contato pelo WhatsApp."
+      />
+      <div className="mx-auto max-w-4xl p-6 lg:p-10">
+        <Card className="mb-5 flex flex-wrap items-end gap-3 p-4">
+          <div>
+            <Label htmlFor="from">De</Label>
+            <Input id="from" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+          </div>
+          <div>
+            <Label htmlFor="to">Até</Label>
+            <Input id="to" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+          </div>
+          <GradientButton onClick={() => downloadCsv(filtered)} disabled={filtered.length === 0} className="ml-auto">
+            <Download className="size-4" />
+            Baixar CSV
+          </GradientButton>
+        </Card>
+
+        <div className="flex flex-col gap-2">
+          {isLoading && <p className="text-sm text-muted-foreground">Carregando...</p>}
+          {!isLoading && filtered.length === 0 && (
+            <p className="text-sm text-muted-foreground">Nenhum lead encontrado.</p>
+          )}
+          {filtered.map((lead) => (
+            <Card key={lead.id} className="flex items-center gap-3 p-3">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
+                <Users className="size-4 text-foreground" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">{lead.name || "(sem nome)"}</p>
+                <p className="text-sm text-muted-foreground">{lead.phone}</p>
+              </div>
+              <span className="text-xs text-muted-foreground">
+                {new Date(lead.first_contact_at).toLocaleDateString("pt-BR")}
+              </span>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

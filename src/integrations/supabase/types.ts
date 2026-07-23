@@ -297,6 +297,33 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          company_id: string
+          created_at: string
+          first_contact_at: string
+          id: string
+          name: string | null
+          phone: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          first_contact_at?: string
+          id?: string
+          name?: string | null
+          phone: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          first_contact_at?: string
+          id?: string
+          name?: string | null
+          phone?: string
+        }
+        Relationships: []
+      }
       admins: {
         Row: {
           created_at: string

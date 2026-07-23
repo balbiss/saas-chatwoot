@@ -6,6 +6,7 @@ import {
   CalendarClock,
   Package,
   FileText,
+  Users,
   ShieldCheck,
   LogOut,
 } from "lucide-react";
@@ -28,6 +29,7 @@ const NAV_ITEMS = [
   { to: "/agenda", label: "Agenda & Calendário", icon: CalendarClock },
   { to: "/produtos", label: "Produtos", icon: Package },
   { to: "/documentos", label: "Documentos", icon: FileText },
+  { to: "/leads", label: "Leads", icon: Users },
 ] as const;
 
 async function fetchIsAdmin(): Promise<boolean> {
