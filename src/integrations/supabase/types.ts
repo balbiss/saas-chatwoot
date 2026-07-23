@@ -256,6 +256,7 @@ export type Database = {
         Row: {
           ai_prompt: string | null
           chatwoot_account_id: string | null
+          chatwoot_inbox_id: string | null
           created_at: string
           id: string
           name: string | null
@@ -266,6 +267,7 @@ export type Database = {
         Insert: {
           ai_prompt?: string | null
           chatwoot_account_id?: string | null
+          chatwoot_inbox_id?: string | null
           created_at?: string
           id?: string
           name?: string | null
@@ -276,12 +278,34 @@ export type Database = {
         Update: {
           ai_prompt?: string | null
           chatwoot_account_id?: string | null
+          chatwoot_inbox_id?: string | null
           created_at?: string
           id?: string
           name?: string | null
           updated_at?: string
           user_id?: string
           whatsapp_phone?: string | null
+        }
+        Relationships: []
+      }
+      admins: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          user_id?: string
         }
         Relationships: []
       }
