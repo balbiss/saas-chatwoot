@@ -1,10 +1,17 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const CHATWOOT_BASE_URL = Deno.env.get("CHATWOOT_BASE_URL")!;
 const CHATWOOT_API_TOKEN = Deno.env.get("CHATWOOT_API_TOKEN")!;
-const CHATWOOT_ACCOUNT_ID = Deno.env.get("CHATWOOT_ACCOUNT_ID") ?? "1";
+const CHATWOOT_PLATFORM_TOKEN = Deno.env.get("CHATWOOT_PLATFORM_TOKEN")!;
+const CHATWOOT_AGENCY_USER_ID = Deno.env.get("CHATWOOT_AGENCY_USER_ID")!;
+
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
 const STANDARD_LABELS = [
   { title: "agendado", color: "#4a90d9" },
@@ -19,16 +26,16 @@ const STANDARD_LABELS = [
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
   });
 }
 
-async function chatwootFetch(path: string, init: RequestInit = {}) {
-  const res = await fetch(`${CHATWOOT_BASE_URL}/api/v1/accounts/${CHATWOOT_ACCOUNT_ID}${path}`, {
+async function chatwootFetch(path: string, token: string, init: RequestInit = {}) {
+  const res = await fetch(`${CHATWOOT_BASE_URL}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
-      api_access_token: CHATWOOT_API_TOKEN,
+      api_access_token: token,
       ...(init.headers ?? {}),
     },
   });
@@ -39,12 +46,30 @@ async function chatwootFetch(path: string, init: RequestInit = {}) {
   return res.json();
 }
 
-async function ensureStandardLabels() {
-  const existing = await chatwootFetch("/labels");
+// Cada empresa vira uma CONTA isolada no Chatwoot (não um inbox dentro de
+// uma conta compartilhada). O usuário da agência (CHATWOOT_AGENCY_USER_ID)
+// é adicionado como administrator em toda conta nova, pra poder entrar e
+// ver o painel de qualquer empresa com o próprio login.
+async function createIsolatedAccount(name: string) {
+  const account = await chatwootFetch("/platform/api/v1/accounts", CHATWOOT_PLATFORM_TOKEN, {
+    method: "POST",
+    body: JSON.stringify({ name, locale: "pt_BR" }),
+  });
+
+  await chatwootFetch(`/platform/api/v1/accounts/${account.id}/account_users`, CHATWOOT_PLATFORM_TOKEN, {
+    method: "POST",
+    body: JSON.stringify({ user_id: Number(CHATWOOT_AGENCY_USER_ID), role: "administrator" }),
+  });
+
+  return account;
+}
+
+async function ensureStandardLabels(accountId: number) {
+  const existing = await chatwootFetch(`/api/v1/accounts/${accountId}/labels`, CHATWOOT_API_TOKEN);
   const existingTitles = new Set((existing.payload ?? []).map((l: { title: string }) => l.title));
   for (const label of STANDARD_LABELS) {
     if (!existingTitles.has(label.title)) {
-      await chatwootFetch("/labels", {
+      await chatwootFetch(`/api/v1/accounts/${accountId}/labels`, CHATWOOT_API_TOKEN, {
         method: "POST",
         body: JSON.stringify({ label: { title: label.title, color: label.color, show_on_sidebar: true } }),
       });
@@ -52,7 +77,37 @@ async function ensureStandardLabels() {
   }
 }
 
+// Só quem está na tabela admins pode provisionar empresas.
+async function requireAdmin(req: Request) {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) throw new Error("UNAUTHORIZED");
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    global: { headers: { Authorization: authHeader } },
+  });
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError || !userData.user) throw new Error("UNAUTHORIZED");
+
+  const { data: admin } = await supabase
+    .from("admins")
+    .select("id")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+  if (!admin) throw new Error("FORBIDDEN");
+}
+
 Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: CORS_HEADERS });
+  }
+
+  try {
+    await requireAdmin(req);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "UNAUTHORIZED";
+    return json({ error: "Acesso restrito a administradores." }, message === "FORBIDDEN" ? 403 : 401);
+  }
+
   try {
     const { name, whatsapp_phone, owner_email, owner_password } = await req.json();
     if (!name || !whatsapp_phone || !owner_email || !owner_password) {
@@ -61,7 +116,9 @@ Deno.serve(async (req: Request) => {
 
     const phone = whatsapp_phone.startsWith("+") ? whatsapp_phone : `+${whatsapp_phone}`;
 
-    const inbox = await chatwootFetch("/inboxes", {
+    const account = await createIsolatedAccount(name);
+
+    const inbox = await chatwootFetch(`/api/v1/accounts/${account.id}/inboxes`, CHATWOOT_API_TOKEN, {
       method: "POST",
       body: JSON.stringify({
         name,
@@ -69,7 +126,7 @@ Deno.serve(async (req: Request) => {
       }),
     });
 
-    await ensureStandardLabels();
+    await ensureStandardLabels(account.id);
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -86,7 +143,7 @@ Deno.serve(async (req: Request) => {
         user_id: userData.user.id,
         name,
         whatsapp_phone: phone,
-        chatwoot_account_id: String(CHATWOOT_ACCOUNT_ID),
+        chatwoot_account_id: String(account.id),
         chatwoot_inbox_id: String(inbox.id),
       })
       .select()
@@ -95,9 +152,10 @@ Deno.serve(async (req: Request) => {
 
     return json({
       company_id: company.id,
+      chatwoot_account_id: account.id,
       chatwoot_inbox_id: inbox.id,
       owner_email,
-      message: "Empresa criada. Falta escanear o QR code do WhatsApp no Chatwoot (Configurações > Inboxes).",
+      message: "Empresa criada em conta isolada no Chatwoot. Falta escanear o QR code do WhatsApp (Configurações > Inboxes).",
     });
   } catch (err) {
     console.error(err);
