@@ -1,5 +1,5 @@
-import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router";
-import { LogOut } from "lucide-react";
+import { createFileRoute, Outlet, redirect, useNavigate, Link } from "@tanstack/react-router";
+import { Building2, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin")({
@@ -34,14 +34,23 @@ function AdminLayout() {
         <span className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           InoovaWeb — Super Admin
         </span>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <LogOut className="size-4" />
-          Sair
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/"
+            className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <Building2 className="size-4" />
+            Minha empresa
+          </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <LogOut className="size-4" />
+            Sair
+          </button>
+        </div>
       </header>
       <main>
         <Outlet />

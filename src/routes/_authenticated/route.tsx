@@ -1,10 +1,12 @@
 import { createFileRoute, Outlet, redirect, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import {
   MessageSquareText,
   CalendarClock,
   Package,
   FileText,
+  ShieldCheck,
   LogOut,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,14 +18,6 @@ export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
-
-    const { data: admin } = await supabase
-      .from("admins")
-      .select("id")
-      .eq("user_id", data.user.id)
-      .maybeSingle();
-    if (admin) throw redirect({ to: "/admin" });
-
     return { user: data.user };
   },
   component: AuthenticatedLayout,
@@ -36,9 +30,21 @@ const NAV_ITEMS = [
   { to: "/documentos", label: "Documentos", icon: FileText },
 ] as const;
 
+async function fetchIsAdmin(): Promise<boolean> {
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return false;
+  const { data } = await supabase
+    .from("admins")
+    .select("id")
+    .eq("user_id", userData.user.id)
+    .maybeSingle();
+  return !!data;
+}
+
 function AuthenticatedLayout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { data: isAdmin } = useQuery({ queryKey: ["is-admin"], queryFn: fetchIsAdmin, staleTime: 60_000 });
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -81,6 +87,15 @@ function AuthenticatedLayout() {
           })}
         </nav>
 
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <ShieldCheck className="size-4" />
+            Super Admin
+          </Link>
+        )}
         <button
           type="button"
           onClick={handleLogout}
