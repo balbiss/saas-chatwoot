@@ -486,6 +486,7 @@ export type Database = {
       company_documents: {
         Row: {
           company_id: string
+          content_type: string
           created_at: string
           file_url: string
           id: string
@@ -493,6 +494,7 @@ export type Database = {
         }
         Insert: {
           company_id: string
+          content_type?: string
           created_at?: string
           file_url: string
           id?: string
@@ -500,6 +502,7 @@ export type Database = {
         }
         Update: {
           company_id?: string
+          content_type?: string
           created_at?: string
           file_url?: string
           id?: string

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { FileText, Trash2, Upload } from "lucide-react";
+import { FileText, Trash2, Upload, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/lib/company";
 import { Card } from "@/components/ui/card";
@@ -43,8 +43,9 @@ function Page() {
 
       const { error } = await supabase.from("company_documents").insert({
         company_id: company.id,
-        title: file.name.replace(/\.pdf$/i, ""),
+        title: file.name.replace(/\.[a-z0-9]+$/i, ""),
         file_url,
+        content_type: file.type || "application/pdf",
       });
       if (error) throw error;
 
@@ -71,12 +72,15 @@ function Page() {
 
   return (
     <div>
-      <PageHeader title="Documentos" description="PDFs que a IA pode enviar aos clientes durante o atendimento." />
+      <PageHeader
+        title="Documentos"
+        description="PDFs e vídeos que a IA pode identificar pelo nome e enviar aos clientes durante o atendimento."
+      />
       <div className="max-w-3xl p-6 lg:p-10">
         <input
           ref={fileInputRef}
           type="file"
-          accept="application/pdf"
+          accept="application/pdf,video/*"
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
@@ -85,24 +89,29 @@ function Page() {
         />
         <GradientButton onClick={() => fileInputRef.current?.click()} loading={uploading}>
           <Upload className="size-4" />
-          Enviar PDF
+          Enviar PDF ou vídeo
         </GradientButton>
 
         <div className="mt-6 space-y-2">
           {!isLoading && documents?.length === 0 && (
             <p className="text-sm text-muted-foreground">Nenhum documento enviado ainda.</p>
           )}
-          {documents?.map((doc) => (
-            <Card key={doc.id} className="flex items-center justify-between p-4 shadow-card">
-              <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:underline">
-                <FileText className="size-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{doc.title}</span>
-              </a>
-              <Button variant="ghost" size="icon" onClick={() => handleDelete(doc.id)}>
-                <Trash2 className="size-4" />
-              </Button>
-            </Card>
-          ))}
+          {documents?.map((doc) => {
+            const isVideo = doc.content_type?.startsWith("video/");
+            const Icon = isVideo ? Video : FileText;
+            return (
+              <Card key={doc.id} className="flex items-center justify-between p-4 shadow-card">
+                <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:underline">
+                  <Icon className="size-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">{doc.title}</span>
+                  <span className="text-xs text-muted-foreground">{isVideo ? "vídeo" : "PDF"}</span>
+                </a>
+                <Button variant="ghost" size="icon" onClick={() => handleDelete(doc.id)}>
+                  <Trash2 className="size-4" />
+                </Button>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>
