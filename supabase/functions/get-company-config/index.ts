@@ -52,12 +52,25 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const { data: companies, error } = await supabase
       .from("companies")
-      .select("id, name, ai_prompt, whatsapp_phone")
+      .select("id, name, ai_prompt, whatsapp_phone, due_date")
       .not("whatsapp_phone", "is", null);
     if (error) throw error;
 
     const company = companies.find((c) => onlyDigits(c.whatsapp_phone ?? "") === phoneDigits);
     if (!company) return json({ error: "Empresa não encontrada para esse número" }, 404);
+
+    // Vencida: a IA para de responder, mas o Chatwoot/painel continuam
+    // acessíveis normalmente (bloqueio só do lado da IA).
+    const today = new Date().toISOString().slice(0, 10);
+    const blocked = !!company.due_date && company.due_date < today;
+    if (blocked) {
+      return json({
+        company_id: company.id,
+        name: company.name,
+        blocked: true,
+        blocked_message: "Ola! No momento nao consigo continuar o atendimento automatico. Por favor, entre em contato para regularizar o pagamento.",
+      });
+    }
 
     const { data: resources, error: resourcesError } = await supabase
       .from("resources")
@@ -70,6 +83,7 @@ Deno.serve(async (req: Request) => {
       company_id: company.id,
       name: company.name,
       ai_prompt: company.ai_prompt,
+      blocked: false,
       resources,
     });
   } catch (err) {

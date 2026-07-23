@@ -7,6 +7,7 @@ const CHATWOOT_BASE_URL = Deno.env.get("CHATWOOT_BASE_URL")!;
 const CHATWOOT_API_TOKEN = Deno.env.get("CHATWOOT_API_TOKEN")!;
 const CHATWOOT_PLATFORM_TOKEN = Deno.env.get("CHATWOOT_PLATFORM_TOKEN")!;
 const CHATWOOT_AGENCY_USER_ID = Deno.env.get("CHATWOOT_AGENCY_USER_ID")!;
+const N8N_SDR_WEBHOOK_URL = Deno.env.get("N8N_SDR_WEBHOOK_URL")!;
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -62,6 +63,49 @@ async function createIsolatedAccount(name: string) {
   });
 
   return account;
+}
+
+// Sem isso o n8n nunca recebe as mensagens dessa empresa: o agente de IA
+// só é acionado por webhook, e cada conta isolada precisa do próprio.
+async function registerSdrWebhook(accountId: number) {
+  await chatwootFetch(`/api/v1/accounts/${accountId}/webhooks`, CHATWOOT_API_TOKEN, {
+    method: "POST",
+    body: JSON.stringify({ webhook: { url: N8N_SDR_WEBHOOK_URL, subscriptions: ["message_created"] } }),
+  });
+}
+
+// Cria um usuário/agente do Chatwoot pra própria empresa (mesmo e-mail/senha
+// do login do painel), só na conta isolada dela — assim ela consegue entrar
+// sozinha e ler o QR code do WhatsApp sem depender da agência.
+async function createCompanyAgent(accountId: number, name: string, email: string, password: string) {
+  const user = await chatwootFetch("/platform/api/v1/users", CHATWOOT_PLATFORM_TOKEN, {
+    method: "POST",
+    body: JSON.stringify({ name, email, password }),
+  });
+
+  await chatwootFetch(`/platform/api/v1/accounts/${accountId}/account_users`, CHATWOOT_PLATFORM_TOKEN, {
+    method: "POST",
+    body: JSON.stringify({ user_id: user.id, role: "administrator" }),
+  });
+
+  return user;
+}
+
+// Times padrão pra onde a IA transfere o lead (ver tool qualificar_lead:
+// "humano" é sempre o fallback quando não bate com nenhum departamento).
+const DEFAULT_TEAMS = ["vendas", "financeiro", "manutencao", "humano"];
+
+async function createDefaultTeams(accountId: number, agentUserId: number) {
+  for (const teamName of DEFAULT_TEAMS) {
+    const team = await chatwootFetch(`/api/v1/accounts/${accountId}/teams`, CHATWOOT_API_TOKEN, {
+      method: "POST",
+      body: JSON.stringify({ team: { name: teamName, allow_auto_assign: true } }),
+    });
+    await chatwootFetch(`/api/v1/accounts/${accountId}/teams/${team.id}/team_members`, CHATWOOT_API_TOKEN, {
+      method: "POST",
+      body: JSON.stringify({ user_ids: [agentUserId] }),
+    });
+  }
 }
 
 async function ensureStandardLabels(accountId: number) {
@@ -127,6 +171,9 @@ Deno.serve(async (req: Request) => {
     });
 
     await ensureStandardLabels(account.id);
+    await registerSdrWebhook(account.id);
+    const agent = await createCompanyAgent(account.id, name, owner_email, owner_password);
+    await createDefaultTeams(account.id, agent.id);
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
