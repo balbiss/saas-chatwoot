@@ -258,6 +258,7 @@ export type Database = {
           chatwoot_account_id: string | null
           chatwoot_inbox_id: string | null
           created_at: string
+          due_date: string | null
           id: string
           name: string | null
           updated_at: string
@@ -269,6 +270,7 @@ export type Database = {
           chatwoot_account_id?: string | null
           chatwoot_inbox_id?: string | null
           created_at?: string
+          due_date?: string | null
           id?: string
           name?: string | null
           updated_at?: string
@@ -280,6 +282,7 @@ export type Database = {
           chatwoot_account_id?: string | null
           chatwoot_inbox_id?: string | null
           created_at?: string
+          due_date?: string | null
           id?: string
           name?: string | null
           updated_at?: string
