@@ -259,6 +259,8 @@ export type Database = {
           chatwoot_inbox_id: string | null
           created_at: string
           due_date: string | null
+          followup_max_attempts: number
+          followup_wait_hours: number
           id: string
           name: string | null
           updated_at: string
@@ -271,6 +273,8 @@ export type Database = {
           chatwoot_inbox_id?: string | null
           created_at?: string
           due_date?: string | null
+          followup_max_attempts?: number
+          followup_wait_hours?: number
           id?: string
           name?: string | null
           updated_at?: string
@@ -283,6 +287,8 @@ export type Database = {
           chatwoot_inbox_id?: string | null
           created_at?: string
           due_date?: string | null
+          followup_max_attempts?: number
+          followup_wait_hours?: number
           id?: string
           name?: string | null
           updated_at?: string

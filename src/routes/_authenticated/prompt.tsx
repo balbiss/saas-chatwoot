@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Sparkles, Wand2 } from "lucide-react";
+import { Clock, Sparkles, Wand2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany, useInvalidateCompany } from "@/lib/company";
 import { PROMPT_TEMPLATES } from "@/lib/prompt-templates";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { GradientButton, PageHeader } from "@/components/gradient-button";
 import { cn } from "@/lib/utils";
@@ -19,10 +21,35 @@ function Page() {
   const [saving, setSaving] = useState(false);
   const [description, setDescription] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [waitHours, setWaitHours] = useState(2);
+  const [maxAttempts, setMaxAttempts] = useState(3);
+  const [savingFollowup, setSavingFollowup] = useState(false);
 
   useEffect(() => {
-    if (company) setPrompt(company.ai_prompt ?? "");
+    if (company) {
+      setPrompt(company.ai_prompt ?? "");
+      setWaitHours(company.followup_wait_hours ?? 2);
+      setMaxAttempts(company.followup_max_attempts ?? 3);
+    }
   }, [company]);
+
+  const handleSaveFollowup = async () => {
+    if (!company) return;
+    setSavingFollowup(true);
+    try {
+      const { error } = await supabase
+        .from("companies")
+        .update({ followup_wait_hours: waitHours, followup_max_attempts: maxAttempts })
+        .eq("id", company.id);
+      if (error) throw error;
+      invalidateCompany();
+      toast.success("Configuração de follow-up salva.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao salvar follow-up");
+    } finally {
+      setSavingFollowup(false);
+    }
+  };
 
   const replacePrompt = (newPrompt: string) => {
     if (prompt.trim() && !confirm("Isso vai substituir o texto atual do prompt. Continuar?")) {
@@ -122,6 +149,48 @@ function Page() {
                       {t.label}
                     </button>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Clock className="size-4 text-primary" />
+                  Follow-up automático
+                </CardTitle>
+                <CardDescription>
+                  Se o lead não responder, a IA manda uma mensagem de retomada. Configure o tempo de espera e
+                  quantas vezes tentar antes de desistir.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="wait_hours">Espera entre tentativas (horas)</Label>
+                    <Input
+                      id="wait_hours"
+                      type="number"
+                      min={1}
+                      value={waitHours}
+                      onChange={(e) => setWaitHours(Number(e.target.value))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="max_attempts">Número de tentativas</Label>
+                    <Input
+                      id="max_attempts"
+                      type="number"
+                      min={0}
+                      value={maxAttempts}
+                      onChange={(e) => setMaxAttempts(Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <GradientButton onClick={handleSaveFollowup} loading={savingFollowup} disabled={isLoading}>
+                    Salvar follow-up
+                  </GradientButton>
                 </div>
               </CardContent>
             </Card>

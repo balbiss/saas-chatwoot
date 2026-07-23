@@ -52,7 +52,7 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const { data: companies, error } = await supabase
       .from("companies")
-      .select("id, name, ai_prompt, whatsapp_phone, due_date")
+      .select("id, name, ai_prompt, whatsapp_phone, due_date, followup_wait_hours, followup_max_attempts")
       .not("whatsapp_phone", "is", null);
     if (error) throw error;
 
@@ -84,6 +84,8 @@ Deno.serve(async (req: Request) => {
       name: company.name,
       ai_prompt: company.ai_prompt,
       blocked: false,
+      followup_wait_hours: company.followup_wait_hours,
+      followup_max_attempts: company.followup_max_attempts,
       resources,
     });
   } catch (err) {
