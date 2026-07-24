@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Clock, Sparkles, Wand2 } from "lucide-react";
+import { Clock, Sparkles, Wand2, UserRoundSearch } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany, useInvalidateCompany } from "@/lib/company";
 import { PROMPT_TEMPLATES } from "@/lib/prompt-templates";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { GradientButton, PageHeader } from "@/components/gradient-button";
 import { cn } from "@/lib/utils";
@@ -24,12 +25,17 @@ function Page() {
   const [waitHours, setWaitHours] = useState(2);
   const [maxAttempts, setMaxAttempts] = useState(3);
   const [savingFollowup, setSavingFollowup] = useState(false);
+  const [reengajamentoEnabled, setReengajamentoEnabled] = useState(false);
+  const [diasInativo, setDiasInativo] = useState(3);
+  const [savingReengajamento, setSavingReengajamento] = useState(false);
 
   useEffect(() => {
     if (company) {
       setPrompt(company.ai_prompt ?? "");
       setWaitHours(company.followup_wait_hours ?? 2);
       setMaxAttempts(company.followup_max_attempts ?? 3);
+      setReengajamentoEnabled(company.reengajamento_enabled ?? false);
+      setDiasInativo(company.reengajamento_dias_inativo ?? 3);
     }
   }, [company]);
 
@@ -48,6 +54,24 @@ function Page() {
       toast.error(err instanceof Error ? err.message : "Falha ao salvar follow-up");
     } finally {
       setSavingFollowup(false);
+    }
+  };
+
+  const handleSaveReengajamento = async () => {
+    if (!company) return;
+    setSavingReengajamento(true);
+    try {
+      const { error } = await supabase
+        .from("companies")
+        .update({ reengajamento_enabled: reengajamentoEnabled, reengajamento_dias_inativo: diasInativo })
+        .eq("id", company.id);
+      if (error) throw error;
+      invalidateCompany();
+      toast.success("Configuração de reengajamento salva.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao salvar reengajamento");
+    } finally {
+      setSavingReengajamento(false);
     }
   };
 
@@ -103,7 +127,7 @@ function Page() {
       <div className="max-w-6xl p-6 lg:p-10">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
           <div className="space-y-5 lg:col-span-5">
-            <Card className="shadow-card">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Wand2 className="size-4 text-primary" />
@@ -130,7 +154,7 @@ function Page() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-card">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-base">Ou comece com um modelo pronto</CardTitle>
                 <CardDescription>Escolha o tipo de negócio mais parecido com o seu.</CardDescription>
@@ -153,7 +177,7 @@ function Page() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-card">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Clock className="size-4 text-primary" />
@@ -194,10 +218,50 @@ function Page() {
                 </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <UserRoundSearch className="size-4 text-primary" />
+                  Reengajamento de lead frio
+                </CardTitle>
+                <CardDescription>
+                  Reabre contato com leads que pararam de responder e ainda não foram qualificados nem
+                  transferidos pra um humano, depois de alguns dias sem atividade.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2.5">
+                  <Label htmlFor="reengajamento_enabled" className="cursor-pointer">
+                    Ativar reengajamento automático
+                  </Label>
+                  <Switch
+                    id="reengajamento_enabled"
+                    checked={reengajamentoEnabled}
+                    onCheckedChange={setReengajamentoEnabled}
+                  />
+                </div>
+                <div className="mt-3">
+                  <Label htmlFor="dias_inativo">Dias sem atividade antes de reengajar</Label>
+                  <Input
+                    id="dias_inativo"
+                    type="number"
+                    min={1}
+                    value={diasInativo}
+                    onChange={(e) => setDiasInativo(Number(e.target.value))}
+                  />
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <GradientButton onClick={handleSaveReengajamento} loading={savingReengajamento} disabled={isLoading}>
+                    Salvar reengajamento
+                  </GradientButton>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="space-y-4 lg:col-span-7">
-            <Card className="shadow-card">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Sparkles className="size-4 text-primary" />

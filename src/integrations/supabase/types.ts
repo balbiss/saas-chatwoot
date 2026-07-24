@@ -263,6 +263,8 @@ export type Database = {
           followup_wait_hours: number
           id: string
           name: string | null
+          reengajamento_dias_inativo: number
+          reengajamento_enabled: boolean
           updated_at: string
           user_id: string
           whatsapp_phone: string | null
@@ -277,6 +279,8 @@ export type Database = {
           followup_wait_hours?: number
           id?: string
           name?: string | null
+          reengajamento_dias_inativo?: number
+          reengajamento_enabled?: boolean
           updated_at?: string
           user_id?: string
           whatsapp_phone?: string | null
@@ -291,9 +295,80 @@ export type Database = {
           followup_wait_hours?: number
           id?: string
           name?: string | null
+          reengajamento_dias_inativo?: number
+          reengajamento_enabled?: boolean
           updated_at?: string
           user_id?: string
           whatsapp_phone?: string | null
+        }
+        Relationships: []
+      }
+      appointments: {
+        Row: {
+          company_id: string
+          contact_phone: string | null
+          conversation_id: string | null
+          created_at: string
+          google_event_id: string | null
+          google_event_link: string | null
+          id: string
+          resource_id: string | null
+          scheduled_at: string
+          status: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          contact_phone?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          google_event_id?: string | null
+          google_event_link?: string | null
+          id?: string
+          resource_id?: string | null
+          scheduled_at: string
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          contact_phone?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          google_event_id?: string | null
+          google_event_link?: string | null
+          id?: string
+          resource_id?: string | null
+          scheduled_at?: string
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      google_calendar_tokens: {
+        Row: {
+          calendar_id: string
+          company_id: string
+          created_at: string
+          refresh_token: string
+          updated_at: string
+        }
+        Insert: {
+          calendar_id?: string
+          company_id: string
+          created_at?: string
+          refresh_token: string
+          updated_at?: string
+        }
+        Update: {
+          calendar_id?: string
+          company_id?: string
+          created_at?: string
+          refresh_token?: string
+          updated_at?: string
         }
         Relationships: []
       }

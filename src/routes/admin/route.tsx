@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect, useNavigate, Link } from "@tanstack/react-router";
 import { Building2, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import inoovawebIcon from "@/assets/inoovaweb-icon.png";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -30,14 +31,17 @@ function AdminLayout() {
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground">
-      <header className="flex items-center justify-between border-b border-border px-6 py-4 lg:px-10">
-        <span className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          InoovaWeb — Super Admin
-        </span>
+      <header className="flex items-center justify-between border-b border-border/60 bg-card px-6 py-4 lg:px-10">
+        <div className="flex items-center gap-2.5">
+          <img src={inoovawebIcon} alt="InoovaWeb" className="size-7 rounded-lg" />
+          <span className="text-sm font-semibold tracking-tight text-foreground">
+            InoovaWeb <span className="text-muted-foreground">— Super Admin</span>
+          </span>
+        </div>
         <div className="flex items-center gap-2">
           <Link
             to="/"
-            className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <Building2 className="size-4" />
             Minha empresa
@@ -45,7 +49,7 @@ function AdminLayout() {
           <button
             type="button"
             onClick={handleLogout}
-            className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <LogOut className="size-4" />
             Sair

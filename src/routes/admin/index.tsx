@@ -6,6 +6,7 @@ import { Building2, Pencil, Plus, Trash2, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -237,17 +238,17 @@ function Page() {
             const overdue = isOverdue(company.due_date);
             return (
               <Card key={company.id} className="flex items-center gap-4 p-4">
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-muted">
-                  <Building2 className="size-5 text-foreground" />
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                  <Building2 className="size-5 text-primary" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-semibold">{company.name || "(sem nome)"}</p>
                     {overdue && (
-                      <span className="flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
+                      <Badge variant="destructive" className="gap-1 text-xs font-medium">
                         <AlertTriangle className="size-3" />
                         Vencida
-                      </span>
+                      </Badge>
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground">

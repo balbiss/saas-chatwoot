@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/lib/company";
 import type { Tables } from "@/integrations/supabase/types";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -211,7 +212,7 @@ function Page() {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {products?.map((product) => (
-            <Card key={product.id} className="overflow-hidden shadow-card">
+            <Card key={product.id} className="overflow-hidden">
               <div className="flex aspect-video items-center justify-center bg-muted">
                 {product.photo_url ? (
                   <img src={product.photo_url} alt={product.name} className="h-full w-full object-cover" />
@@ -223,9 +224,9 @@ function Page() {
                 <div className="flex items-start justify-between gap-2">
                   <p className="font-semibold">{product.name}</p>
                   {!product.available && (
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                    <Badge variant="secondary" className="shrink-0 text-[10px] uppercase tracking-wide">
                       Indisponível
-                    </span>
+                    </Badge>
                   )}
                 </div>
                 {product.price != null && (

@@ -17,6 +17,7 @@ import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
+import { Route as AuthenticatedMetricasRouteImport } from './routes/_authenticated/metricas'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 
@@ -59,6 +60,11 @@ const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMetricasRoute = AuthenticatedMetricasRouteImport.update({
+  id: '/metricas',
+  path: '/metricas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/produtos': typeof AuthenticatedProdutosRoute
   '/prompt': typeof AuthenticatedPromptRoute
   '/leads': typeof AuthenticatedLeadsRoute
+  '/metricas': typeof AuthenticatedMetricasRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/produtos': typeof AuthenticatedProdutosRoute
   '/prompt': typeof AuthenticatedPromptRoute
   '/leads': typeof AuthenticatedLeadsRoute
+  '/metricas': typeof AuthenticatedMetricasRoute
   '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
@@ -101,13 +109,14 @@ export interface FileRoutesById {
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/prompt': typeof AuthenticatedPromptRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRoute
+  '/_authenticated/metricas': typeof AuthenticatedMetricasRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/admin' | '/agenda' | '/documentos' | '/produtos' | '/prompt' | '/leads'
+  fullPaths: '/' | '/auth' | '/admin' | '/agenda' | '/documentos' | '/produtos' | '/prompt' | '/leads' | '/metricas'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/admin' | '/agenda' | '/documentos' | '/produtos' | '/prompt' | '/leads' | '/'
+  to: '/auth' | '/admin' | '/agenda' | '/documentos' | '/produtos' | '/prompt' | '/leads' | '/metricas' | '/'
   id:
     | '__root__'
     | '/_authenticated'
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/_authenticated/produtos'
     | '/_authenticated/prompt'
     | '/_authenticated/leads'
+    | '/_authenticated/metricas'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
@@ -186,6 +196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeadsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/metricas': {
+      id: '/_authenticated/metricas'
+      path: '/metricas'
+      fullPath: '/metricas'
+      preLoaderRoute: typeof AuthenticatedMetricasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -209,6 +226,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedPromptRoute: typeof AuthenticatedPromptRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
+  AuthenticatedMetricasRoute: typeof AuthenticatedMetricasRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
@@ -218,6 +236,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedPromptRoute: AuthenticatedPromptRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
+  AuthenticatedMetricasRoute: AuthenticatedMetricasRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 

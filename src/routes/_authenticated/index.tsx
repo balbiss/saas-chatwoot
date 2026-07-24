@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { MessageSquareText, CalendarClock, Package, FileText } from "lucide-react";
+import { MessageSquareText, CalendarClock, Package, FileText, Users, BarChart3 } from "lucide-react";
 import { useCompany } from "@/lib/company";
 import { PageHeader } from "@/components/gradient-button";
 
@@ -11,6 +11,8 @@ const SHORTCUTS = [
   { to: "/agenda", label: "Agenda & Calendário", description: "Conecte o Google Calendar e configure horários.", icon: CalendarClock },
   { to: "/produtos", label: "Produtos", description: "Cadastre fotos, preços e disponibilidade.", icon: Package },
   { to: "/documentos", label: "Documentos", description: "PDFs que a IA pode enviar aos clientes.", icon: FileText },
+  { to: "/leads", label: "Leads", description: "Veja quem entrou em contato e exporte a lista.", icon: Users },
+  { to: "/metricas", label: "Métricas", description: "Funil de conversão e atendimento da IA.", icon: BarChart3 },
 ] as const;
 
 function Page() {
@@ -22,7 +24,7 @@ function Page() {
         title={`Olá${company?.name ? `, ${company.name}` : ""}`}
         description="Configure seu atendimento abaixo."
       />
-      <div className="grid max-w-6xl grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-4 lg:p-10">
+      <div className="grid max-w-5xl grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3 lg:p-10">
         {SHORTCUTS.map((item, i) => {
           const Icon = item.icon;
           return (
@@ -34,13 +36,13 @@ function Page() {
             >
               <Link
                 to={item.to}
-                className="group flex items-start gap-4 rounded-2xl border border-border bg-card p-5 shadow-card transition-shadow hover:shadow-lift"
+                className="group flex items-start gap-4 rounded-xl border border-border/60 bg-card p-5 shadow-sm transition-colors hover:border-primary/30"
               >
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-muted">
-                  <Icon className="size-5 text-foreground" />
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <Icon className="size-4.5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold">{item.label}</p>
+                  <p className="font-medium text-foreground">{item.label}</p>
                   <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
                 </div>
               </Link>

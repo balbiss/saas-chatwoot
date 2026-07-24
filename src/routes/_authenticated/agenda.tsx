@@ -18,6 +18,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { GradientButton, PageHeader } from "@/components/gradient-button";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/agenda")({ component: Page });
@@ -59,7 +60,7 @@ function GoogleCalendarCard({ companyId }: { companyId: string | undefined }) {
   const connected = connection?.status === "connected";
 
   return (
-    <Card className="shadow-card">
+    <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           {connected ? (
@@ -360,7 +361,7 @@ function ResourcesSection({ companyId }: { companyId: string | undefined }) {
   };
 
   return (
-    <Card className="shadow-card">
+    <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <div>
           <CardTitle className="text-base">Profissionais</CardTitle>
@@ -385,7 +386,7 @@ function ResourcesSection({ companyId }: { companyId: string | undefined }) {
           {resources?.map((resource) => (
             <div
               key={resource.id}
-              className="flex items-center justify-between gap-3 rounded-xl border border-border p-4"
+              className="flex items-center justify-between gap-3 rounded-xl border border-border/60 p-4"
             >
               <div className="flex items-center gap-3">
                 <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted">
@@ -395,9 +396,9 @@ function ResourcesSection({ companyId }: { companyId: string | undefined }) {
                   <p className="text-sm font-medium">
                     {resource.name}
                     {!resource.active && (
-                      <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                      <Badge variant="secondary" className="ml-2 align-middle text-[10px] uppercase tracking-wide">
                         Inativo
-                      </span>
+                      </Badge>
                     )}
                   </p>
                   <p className="text-xs text-muted-foreground">

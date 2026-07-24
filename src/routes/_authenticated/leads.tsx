@@ -8,6 +8,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { StatTile } from "@/components/ui/stat-tile";
 import { GradientButton, PageHeader } from "@/components/gradient-button";
 
 export const Route = createFileRoute("/_authenticated/leads")({ component: Page });
@@ -70,6 +71,10 @@ function Page() {
         description="Nome e telefone de quem já entrou em contato pelo WhatsApp."
       />
       <div className="mx-auto max-w-4xl p-6 lg:p-10">
+        <div className="mb-5">
+          <StatTile icon={Users} label="Leads no período" value={filtered.length} className="max-w-xs" />
+        </div>
+
         <Card className="mb-5 flex flex-wrap items-end gap-3 p-4">
           <div>
             <Label htmlFor="from">De</Label>
@@ -92,8 +97,8 @@ function Page() {
           )}
           {filtered.map((lead) => (
             <Card key={lead.id} className="flex items-center gap-3 p-3">
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
-                <Users className="size-4 text-foreground" />
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                <Users className="size-4 text-primary" />
               </div>
               <div className="flex-1">
                 <p className="font-medium">{lead.name || "(sem nome)"}</p>

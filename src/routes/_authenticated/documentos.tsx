@@ -100,7 +100,7 @@ function Page() {
             const isVideo = doc.content_type?.startsWith("video/");
             const Icon = isVideo ? Video : FileText;
             return (
-              <Card key={doc.id} className="flex items-center justify-between p-4 shadow-card">
+              <Card key={doc.id} className="flex items-center justify-between p-4">
                 <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:underline">
                   <Icon className="size-4 text-muted-foreground" />
                   <span className="text-sm font-medium">{doc.title}</span>

@@ -22,22 +22,9 @@ export function GradientButton({
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      whileHover={{ y: -1 }}
       whileTap={{ scale: 0.985 }}
-      className={`group relative flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-primary)] ring-1 ring-white/20 backdrop-blur-md transition-shadow hover:shadow-lg disabled:opacity-60 ${className}`}
-      style={{
-        backgroundImage:
-          "linear-gradient(135deg, color-mix(in oklab, var(--primary) 92%, white 8%) 0%, color-mix(in oklab, var(--primary) 75%, black 20%) 100%)",
-      }}
+      className={`flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-60 ${className}`}
     >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-full bg-gradient-to-b from-white/25 to-transparent"
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full"
-      />
       <AnimatePresence mode="wait" initial={false}>
         {loading ? (
           <motion.span key="busy" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
@@ -56,8 +43,8 @@ export function GradientButton({
 
 export function PageHeader({ title, description }: { title: string; description?: string }) {
   return (
-    <div className="border-b border-border px-6 py-6 lg:px-10">
-      <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+    <div className="border-b border-border/60 px-6 py-6 lg:px-10">
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
       {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
     </div>
   );
