@@ -388,6 +388,7 @@ function Page() {
 
       {company && (
         <ProductDialog
+          key={editing?.id ?? "new"}
           companyId={company.id}
           product={editing}
           open={dialogOpen}

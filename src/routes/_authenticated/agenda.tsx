@@ -537,6 +537,7 @@ function ResourcesSection({ companyId }: { companyId: string | undefined }) {
 
       {companyId && (
         <ResourceDialog
+          key={editing?.id ?? "new"}
           companyId={companyId}
           resource={editing}
           open={dialogOpen}
