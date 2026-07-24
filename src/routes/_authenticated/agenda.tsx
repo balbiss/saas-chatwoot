@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarCheck2, CalendarX2, Clock, Pencil, Plus, Trash2, UserRound } from "lucide-react";
+import { CalendarCheck2, CalendarOff, CalendarX2, Clock, Pencil, Plus, Trash2, UserRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany, useInvalidateCompany } from "@/lib/company";
 import type { Tables } from "@/integrations/supabase/types";
@@ -10,6 +10,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -541,6 +548,182 @@ function ResourcesSection({ companyId }: { companyId: string | undefined }) {
   );
 }
 
+const PERIODOS = [
+  { value: "dia_todo", label: "Dia todo" },
+  { value: "manha", label: "Manhã (até 12h)" },
+  { value: "tarde", label: "Tarde (12h-18h)" },
+  { value: "noite", label: "Noite (a partir das 18h)" },
+] as const;
+
+type Bloqueio = Tables<"agenda_bloqueios">;
+
+function BloqueiosSection({ companyId }: { companyId: string | undefined }) {
+  const queryClient = useQueryClient();
+  const [data, setData] = useState("");
+  const [periodo, setPeriodo] = useState<string>("dia_todo");
+  const [resourceId, setResourceId] = useState<string>("todos");
+  const [motivo, setMotivo] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const { data: resources } = useQuery({
+    queryKey: ["resources-simple", companyId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("resources").select("id, name").eq("company_id", companyId!);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!companyId,
+  });
+
+  const { data: bloqueios, isLoading } = useQuery({
+    queryKey: ["agenda-bloqueios", companyId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("agenda_bloqueios")
+        .select("*")
+        .eq("company_id", companyId!)
+        .order("data", { ascending: true });
+      if (error) throw error;
+      return data as Bloqueio[];
+    },
+    enabled: !!companyId,
+  });
+
+  const resourceName = (id: string | null) => {
+    if (!id) return "Toda a empresa";
+    return resources?.find((r) => r.id === id)?.name ?? "Profissional removido";
+  };
+
+  const handleCreate = async () => {
+    if (!companyId || !data) {
+      toast.error("Escolha uma data.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const { error } = await supabase.from("agenda_bloqueios").insert({
+        company_id: companyId,
+        resource_id: resourceId === "todos" ? null : resourceId,
+        data,
+        periodo,
+        motivo: motivo.trim() || null,
+      });
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ["agenda-bloqueios", companyId] });
+      toast.success("Bloqueio criado.");
+      setData("");
+      setMotivo("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao criar bloqueio");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from("agenda_bloqueios").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    queryClient.invalidateQueries({ queryKey: ["agenda-bloqueios", companyId] });
+    toast.success("Bloqueio removido.");
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <CalendarOff className="size-4 text-primary" />
+          Bloqueios de agenda
+        </CardTitle>
+        <CardDescription>
+          Imprevistos: feriado, folga, manutenção etc. A IA não agenda nada pro profissional (ou pra empresa
+          toda) no dia e período marcados aqui.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label htmlFor="bloqueio_data">Data</Label>
+            <Input id="bloqueio_data" type="date" value={data} onChange={(e) => setData(e.target.value)} />
+          </div>
+          <div>
+            <Label>Período</Label>
+            <Select value={periodo} onValueChange={setPeriodo}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PERIODOS.map((p) => (
+                  <SelectItem key={p.value} value={p.value}>
+                    {p.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="mt-3">
+          <Label>Quem é afetado</Label>
+          <Select value={resourceId} onValueChange={setResourceId}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Toda a empresa</SelectItem>
+              {resources?.map((r) => (
+                <SelectItem key={r.id} value={r.id}>
+                  {r.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="mt-3">
+          <Label htmlFor="bloqueio_motivo">Motivo (opcional)</Label>
+          <Input
+            id="bloqueio_motivo"
+            value={motivo}
+            onChange={(e) => setMotivo(e.target.value)}
+            placeholder="Ex: feriado, folga, manutenção"
+          />
+        </div>
+        <div className="mt-3 flex justify-end">
+          <GradientButton onClick={handleCreate} loading={saving} disabled={!companyId}>
+            <Plus className="size-4" />
+            Adicionar bloqueio
+          </GradientButton>
+        </div>
+
+        <div className="mt-5 space-y-2">
+          {!isLoading && bloqueios?.length === 0 && (
+            <p className="text-sm text-muted-foreground">Nenhum bloqueio cadastrado.</p>
+          )}
+          {bloqueios?.map((b) => (
+            <div
+              key={b.id}
+              className="flex items-center justify-between gap-3 rounded-lg border border-border/60 px-3 py-2.5"
+            >
+              <div className="text-sm">
+                <span className="font-medium">{new Date(b.data + "T12:00:00").toLocaleDateString("pt-BR")}</span>
+                {" · "}
+                <span className="text-muted-foreground">
+                  {PERIODOS.find((p) => p.value === b.periodo)?.label} · {resourceName(b.resource_id)}
+                  {b.motivo ? ` · ${b.motivo}` : ""}
+                </span>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => handleDelete(b.id)}>
+                <Trash2 className="size-3.5" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function Page() {
   const { data: company } = useCompany();
 
@@ -552,8 +735,9 @@ function Page() {
           <GoogleCalendarCard companyId={company?.id} />
           <HorarioAtendimentoCard companyId={company?.id} />
         </div>
-        <div className="lg:col-span-7">
+        <div className="space-y-5 lg:col-span-7">
           <ResourcesSection companyId={company?.id} />
+          <BloqueiosSection companyId={company?.id} />
         </div>
       </div>
     </div>

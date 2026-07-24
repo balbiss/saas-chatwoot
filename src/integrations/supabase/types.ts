@@ -357,6 +357,36 @@ export type Database = {
         }
         Relationships: []
       }
+      agenda_bloqueios: {
+        Row: {
+          company_id: string
+          created_at: string
+          data: string
+          id: string
+          motivo: string | null
+          periodo: string
+          resource_id: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          data: string
+          id?: string
+          motivo?: string | null
+          periodo?: string
+          resource_id?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          data?: string
+          id?: string
+          motivo?: string | null
+          periodo?: string
+          resource_id?: string | null
+        }
+        Relationships: []
+      }
       google_calendar_tokens: {
         Row: {
           calendar_id: string
