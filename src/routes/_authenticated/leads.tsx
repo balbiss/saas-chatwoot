@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Download, Users } from "lucide-react";
+import { toast } from "sonner";
+import { Eraser, Download, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/lib/company";
 import type { Tables } from "@/integrations/supabase/types";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { StatTile } from "@/components/ui/stat-tile";
 import { GradientButton, PageHeader } from "@/components/gradient-button";
 
@@ -43,10 +45,30 @@ function downloadCsv(leads: Lead[]) {
   URL.revokeObjectURL(url);
 }
 
+async function clearChatMemory(phone: string) {
+  const { data, error } = await supabase.functions.invoke("clear-chat-memory", { body: { phone } });
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+}
+
 function Page() {
   const { data: company } = useCompany();
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [clearingPhone, setClearingPhone] = useState<string | null>(null);
+
+  const handleClearMemory = async (lead: Lead) => {
+    if (!confirm(`Limpar a memória da conversa da IA com "${lead.name || lead.phone}"? A IA vai esquecer todo o histórico dessa conversa.`)) return;
+    setClearingPhone(lead.phone);
+    try {
+      await clearChatMemory(lead.phone);
+      toast.success("Memória da IA limpa pra esse contato.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao limpar a memória");
+    } finally {
+      setClearingPhone(null);
+    }
+  };
 
   const { data: leads, isLoading } = useQuery({
     queryKey: ["leads", company?.id],
@@ -107,6 +129,15 @@ function Page() {
               <span className="text-xs text-muted-foreground">
                 {new Date(lead.first_contact_at).toLocaleDateString("pt-BR")}
               </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleClearMemory(lead)}
+                disabled={clearingPhone === lead.phone}
+                title="Limpar memória da IA com esse contato (útil pra testes)"
+              >
+                <Eraser className="size-3.5" />
+              </Button>
             </Card>
           ))}
         </div>
