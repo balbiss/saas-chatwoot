@@ -210,6 +210,7 @@ type ResourceForm = {
   max_por_dia: number | null;
   exige_pagamento: boolean;
   valor_sinal: string;
+  tipo_cobranca: "sinal" | "integral";
 };
 
 const DEFAULT_FORM: ResourceForm = {
@@ -224,6 +225,7 @@ const DEFAULT_FORM: ResourceForm = {
   max_por_dia: null,
   exige_pagamento: false,
   valor_sinal: "",
+  tipo_cobranca: "sinal",
 };
 
 function ResourceDialog({
@@ -253,6 +255,7 @@ function ResourceDialog({
           max_por_dia: resource.agenda_config?.max_por_dia ?? null,
           exige_pagamento: resource.exige_pagamento,
           valor_sinal: resource.valor_sinal != null ? String(resource.valor_sinal) : "",
+          tipo_cobranca: (resource.tipo_cobranca as "sinal" | "integral") ?? "sinal",
         }
       : DEFAULT_FORM,
   );
@@ -285,6 +288,7 @@ function ResourceDialog({
         active: form.active,
         exige_pagamento: form.exige_pagamento,
         valor_sinal: form.exige_pagamento ? Number(form.valor_sinal) : null,
+        tipo_cobranca: form.tipo_cobranca,
       };
 
       let resourceId = resource?.id;
@@ -454,22 +458,45 @@ function ResourceDialog({
               />
             </div>
             {form.exige_pagamento && (
-              <div className="mt-4">
-                <Label htmlFor="r_valor_sinal">Valor do sinal/pagamento (R$)</Label>
-                <Input
-                  id="r_valor_sinal"
-                  type="number"
-                  min={0.01}
-                  step={0.01}
-                  value={form.valor_sinal}
-                  onChange={(e) => setForm((f) => ({ ...f, valor_sinal: e.target.value }))}
-                  placeholder="Ex: 50.00"
-                  className="mt-1.5 max-w-[160px]"
-                />
-                <p className="mt-2 text-xs text-muted-foreground">
+              <div className="mt-4 space-y-4">
+                <div>
+                  <Label>Tipo de cobrança</Label>
+                  <Select
+                    value={form.tipo_cobranca}
+                    onValueChange={(v) => setForm((f) => ({ ...f, tipo_cobranca: v as "sinal" | "integral" }))}
+                  >
+                    <SelectTrigger className="mt-1.5">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sinal">Sinal (cliente paga uma parte, o resto no dia)</SelectItem>
+                      <SelectItem value="integral">Valor integral (cliente paga tudo agora)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="r_valor_sinal">
+                    {form.tipo_cobranca === "sinal" ? "Valor do sinal (R$)" : "Valor integral (R$)"}
+                  </Label>
+                  <Input
+                    id="r_valor_sinal"
+                    type="number"
+                    min={0.01}
+                    step={0.01}
+                    value={form.valor_sinal}
+                    onChange={(e) => setForm((f) => ({ ...f, valor_sinal: e.target.value }))}
+                    placeholder="Ex: 50.00"
+                    className="mt-1.5 max-w-[160px]"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
                   Usa o mesmo Mercado Pago já configurado na página Prompt da IA. Ao pedir esse horário, a IA avisa
-                  o cliente do valor, manda um Pix e só confirma o agendamento (evento no Google Calendar) depois
-                  que o pagamento cai. Se o cliente não pagar a tempo, ele recebe um lembrete automático.
+                  o cliente que é{" "}
+                  {form.tipo_cobranca === "sinal"
+                    ? "um SINAL e que o restante é combinado direto com você no dia"
+                    : "o VALOR INTEGRAL da visita"}
+                  , manda um Pix e só confirma o agendamento (evento no Google Calendar) depois que o pagamento cai.
+                  Se o cliente não pagar a tempo, ele recebe um lembrete automático.
                 </p>
               </div>
             )}
@@ -557,7 +584,8 @@ function ResourcesSection({ companyId }: { companyId: string | undefined }) {
                     )}
                     {resource.exige_pagamento && (
                       <Badge className="ml-2 align-middle text-[10px] uppercase tracking-wide">
-                        Cobra R$ {Number(resource.valor_sinal).toFixed(2).replace(".", ",")}
+                        {resource.tipo_cobranca === "integral" ? "Integral" : "Sinal"} R${" "}
+                        {Number(resource.valor_sinal).toFixed(2).replace(".", ",")}
                       </Badge>
                     )}
                   </p>

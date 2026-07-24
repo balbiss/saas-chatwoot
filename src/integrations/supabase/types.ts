@@ -471,6 +471,7 @@ export type Database = {
           exige_pagamento: boolean
           id: string
           name: string
+          tipo_cobranca: string
           updated_at: string
           valor_sinal: number | null
         }
@@ -482,6 +483,7 @@ export type Database = {
           exige_pagamento?: boolean
           id?: string
           name: string
+          tipo_cobranca?: string
           updated_at?: string
           valor_sinal?: number | null
         }
@@ -493,6 +495,7 @@ export type Database = {
           exige_pagamento?: boolean
           id?: string
           name?: string
+          tipo_cobranca?: string
           updated_at?: string
           valor_sinal?: number | null
         }
@@ -515,6 +518,7 @@ export type Database = {
           status: string
           telefone: string | null
           termo_contato: string | null
+          tipo_cobranca: string
           titulo: string | null
           updated_at: string
           valor: number | null
@@ -535,6 +539,7 @@ export type Database = {
           status?: string
           telefone?: string | null
           termo_contato?: string | null
+          tipo_cobranca?: string
           titulo?: string | null
           updated_at?: string
           valor?: number | null
@@ -555,6 +560,7 @@ export type Database = {
           status?: string
           telefone?: string | null
           termo_contato?: string | null
+          tipo_cobranca?: string
           titulo?: string | null
           updated_at?: string
           valor?: number | null
