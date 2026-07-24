@@ -31,8 +31,17 @@ function Page() {
     enabled: !!company?.id,
   });
 
+  const MAX_FILE_SIZE = 50 * 1024 * 1024;
+
   const handleUpload = async (file: File) => {
     if (!company) return;
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(
+        `Arquivo muito grande (${(file.size / 1024 / 1024).toFixed(1)}MB). O limite atual é 50MB — vídeos maiores que isso precisam ser comprimidos antes, ou fale com o suporte para aumentar esse limite.`,
+      );
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
     setUploading(true);
     try {
       const path = `${company.id}/${Date.now()}-${file.name}`;
@@ -91,6 +100,7 @@ function Page() {
           <Upload className="size-4" />
           Enviar PDF ou vídeo
         </GradientButton>
+        <p className="mt-2 text-xs text-muted-foreground">Tamanho máximo: 50MB por arquivo.</p>
 
         <div className="mt-6 space-y-2">
           {!isLoading && documents?.length === 0 && (
