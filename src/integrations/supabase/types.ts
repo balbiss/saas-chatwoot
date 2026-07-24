@@ -261,6 +261,9 @@ export type Database = {
           due_date: string | null
           followup_max_attempts: number
           followup_wait_hours: number
+          horario_atendimento_dias: number[]
+          horario_atendimento_fim: string
+          horario_atendimento_inicio: string
           id: string
           name: string | null
           reengajamento_dias_inativo: number
@@ -277,6 +280,9 @@ export type Database = {
           due_date?: string | null
           followup_max_attempts?: number
           followup_wait_hours?: number
+          horario_atendimento_dias?: number[]
+          horario_atendimento_fim?: string
+          horario_atendimento_inicio?: string
           id?: string
           name?: string | null
           reengajamento_dias_inativo?: number
@@ -293,6 +299,9 @@ export type Database = {
           due_date?: string | null
           followup_max_attempts?: number
           followup_wait_hours?: number
+          horario_atendimento_dias?: number[]
+          horario_atendimento_fim?: string
+          horario_atendimento_inicio?: string
           id?: string
           name?: string | null
           reengajamento_dias_inativo?: number

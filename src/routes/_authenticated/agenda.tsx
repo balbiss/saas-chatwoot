@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CalendarCheck2, CalendarX2, Pencil, Plus, Trash2, UserRound } from "lucide-react";
+import { CalendarCheck2, CalendarX2, Clock, Pencil, Plus, Trash2, UserRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useCompany } from "@/lib/company";
+import { useCompany, useInvalidateCompany } from "@/lib/company";
 import type { Tables } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -86,6 +86,105 @@ function GoogleCalendarCard({ companyId }: { companyId: string | undefined }) {
             {connected ? "Reconectar" : "Conectar Google Calendar"}
           </GradientButton>
         </a>
+      </CardContent>
+    </Card>
+  );
+}
+
+function HorarioAtendimentoCard({ companyId }: { companyId: string | undefined }) {
+  const { data: company } = useCompany();
+  const invalidateCompany = useInvalidateCompany();
+  const [dias, setDias] = useState<number[]>([1, 2, 3, 4, 5]);
+  const [inicio, setInicio] = useState("08:00");
+  const [fim, setFim] = useState("18:00");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (company) {
+      setDias(company.horario_atendimento_dias ?? [1, 2, 3, 4, 5]);
+      setInicio((company.horario_atendimento_inicio ?? "08:00:00").slice(0, 5));
+      setFim((company.horario_atendimento_fim ?? "18:00:00").slice(0, 5));
+    }
+  }, [company]);
+
+  const toggleDay = (day: number) => {
+    setDias((d) => (d.includes(day) ? d.filter((x) => x !== day) : [...d, day].sort()));
+  };
+
+  const handleSave = async () => {
+    if (!companyId) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("companies")
+        .update({
+          horario_atendimento_dias: dias,
+          horario_atendimento_inicio: inicio,
+          horario_atendimento_fim: fim,
+        })
+        .eq("id", companyId);
+      if (error) throw error;
+      invalidateCompany();
+      toast.success("Horário de atendimento salvo.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao salvar horário de atendimento");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Clock className="size-4 text-primary" />
+          Horário de atendimento
+        </CardTitle>
+        <CardDescription>
+          Quando um time (vendas, financeiro, manutenção ou humano) pode receber conversas transferidas pela
+          IA. Fora desse horário, o cliente recebe um aviso e ninguém é notificado até o expediente reabrir.
+          Se o atendimento vira a madrugada, coloque um horário de início maior que o de fim (ex: 22:00 às 06:00).
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="mb-3">
+          <Label className="mb-2 block">Dias de atendimento</Label>
+          <div className="flex flex-wrap gap-2">
+            {DAYS.map((day) => {
+              const active = dias.includes(day.value);
+              return (
+                <button
+                  key={day.value}
+                  type="button"
+                  onClick={() => toggleDay(day.value)}
+                  className={cn(
+                    "rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors",
+                    active
+                      ? "border-transparent bg-primary text-primary-foreground"
+                      : "border-border bg-transparent text-muted-foreground hover:bg-muted",
+                  )}
+                >
+                  {day.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label htmlFor="ha_inicio">Início</Label>
+            <Input id="ha_inicio" type="time" value={inicio} onChange={(e) => setInicio(e.target.value)} />
+          </div>
+          <div>
+            <Label htmlFor="ha_fim">Fim</Label>
+            <Input id="ha_fim" type="time" value={fim} onChange={(e) => setFim(e.target.value)} />
+          </div>
+        </div>
+        <div className="mt-3 flex justify-end">
+          <GradientButton onClick={handleSave} loading={saving} disabled={!companyId}>
+            Salvar horário
+          </GradientButton>
+        </div>
       </CardContent>
     </Card>
   );
@@ -449,8 +548,9 @@ function Page() {
     <div>
       <PageHeader title="Agenda & Calendário" description="Conecte o Google Calendar e cadastre a agenda de cada profissional." />
       <div className="grid max-w-6xl grid-cols-1 gap-5 p-6 lg:grid-cols-12 lg:p-10">
-        <div className="lg:col-span-5">
+        <div className="space-y-5 lg:col-span-5">
           <GoogleCalendarCard companyId={company?.id} />
+          <HorarioAtendimentoCard companyId={company?.id} />
         </div>
         <div className="lg:col-span-7">
           <ResourcesSection companyId={company?.id} />
