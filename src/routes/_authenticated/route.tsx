@@ -29,12 +29,12 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 const NAV_ITEMS = [
+  { to: "/metricas", label: "Dashboard", icon: BarChart3 },
   { to: "/prompt", label: "Prompt da IA", icon: MessageSquareText },
   { to: "/agenda", label: "Agenda & Calendário", icon: CalendarClock },
   { to: "/produtos", label: "Produtos", icon: Package },
   { to: "/documentos", label: "Documentos", icon: FileText },
   { to: "/leads", label: "Leads", icon: Users },
-  { to: "/metricas", label: "Métricas", icon: BarChart3 },
 ] as const;
 
 async function fetchIsAdmin(): Promise<boolean> {
@@ -51,7 +51,7 @@ async function fetchIsAdmin(): Promise<boolean> {
 function NavLinks({ pathname, isAdmin, onNavigate }: { pathname: string; isAdmin?: boolean; onNavigate?: () => void }) {
   return (
     <>
-      <nav className="mt-8 flex flex-1 flex-col gap-1">
+      <nav className="mt-10 flex flex-1 flex-col gap-1.5">
         {NAV_ITEMS.map((item) => {
           const active = pathname.startsWith(item.to);
           const Icon = item.icon;
@@ -105,7 +105,7 @@ function AuthenticatedLayout() {
 
   return (
     <div className="flex min-h-screen w-full bg-background text-foreground">
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-border/60 bg-card px-4 py-6 lg:flex">
+      <aside className="hidden w-72 shrink-0 flex-col border-r border-border/60 bg-card px-5 py-8 lg:flex">
         <Link to="/" className="flex items-center gap-2.5 px-2">
           <img src={inoovawebIcon} alt="InoovaWeb" className="size-8 rounded-lg" />
           <span className="text-sm font-semibold tracking-tight text-foreground">InoovaWeb</span>

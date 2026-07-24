@@ -92,7 +92,7 @@ function Page() {
         title="Leads"
         description="Nome e telefone de quem já entrou em contato pelo WhatsApp."
       />
-      <div className="mx-auto max-w-4xl p-6 lg:p-10">
+      <div className="mx-auto max-w-5xl p-8 lg:p-14">
         <div className="mb-5">
           <StatTile icon={Users} label="Leads no período" value={filtered.length} className="max-w-xs" />
         </div>

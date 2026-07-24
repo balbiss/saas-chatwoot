@@ -117,7 +117,7 @@ function Page() {
         title="Documentos"
         description="PDFs e vídeos que a IA pode identificar pelo nome e enviar aos clientes durante o atendimento."
       />
-      <div className="max-w-3xl p-6 lg:p-10">
+      <div className="max-w-4xl p-8 lg:p-14">
         <input
           ref={fileInputRef}
           type="file"

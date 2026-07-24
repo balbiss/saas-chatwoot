@@ -1,55 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import { MessageSquareText, CalendarClock, Package, FileText, Users, BarChart3 } from "lucide-react";
-import { useCompany } from "@/lib/company";
-import { PageHeader } from "@/components/gradient-button";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authenticated/")({ component: Page });
-
-const SHORTCUTS = [
-  { to: "/prompt", label: "Prompt da IA", description: "Defina como a IA deve responder seus clientes.", icon: MessageSquareText },
-  { to: "/agenda", label: "Agenda & Calendário", description: "Conecte o Google Calendar e configure horários.", icon: CalendarClock },
-  { to: "/produtos", label: "Produtos", description: "Cadastre fotos, preços e disponibilidade.", icon: Package },
-  { to: "/documentos", label: "Documentos", description: "PDFs que a IA pode enviar aos clientes.", icon: FileText },
-  { to: "/leads", label: "Leads", description: "Veja quem entrou em contato e exporte a lista.", icon: Users },
-  { to: "/metricas", label: "Métricas", description: "Funil de conversão e atendimento da IA.", icon: BarChart3 },
-] as const;
-
-function Page() {
-  const { data: company } = useCompany();
-
-  return (
-    <div>
-      <PageHeader
-        title={`Olá${company?.name ? `, ${company.name}` : ""}`}
-        description="Configure seu atendimento abaixo."
-      />
-      <div className="grid max-w-5xl grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3 lg:p-10">
-        {SHORTCUTS.map((item, i) => {
-          const Icon = item.icon;
-          return (
-            <motion.div
-              key={item.to}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <Link
-                to={item.to}
-                className="group flex items-start gap-4 rounded-xl border border-border/60 bg-card p-5 shadow-sm transition-colors hover:border-primary/30"
-              >
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                  <Icon className="size-4.5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">{item.label}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
-                </div>
-              </Link>
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
+export const Route = createFileRoute("/_authenticated/")({
+  beforeLoad: () => {
+    throw redirect({ to: "/metricas" });
+  },
+});

@@ -731,7 +731,7 @@ function Page() {
   return (
     <div>
       <PageHeader title="Agenda & Calendário" description="Conecte o Google Calendar e cadastre a agenda de cada profissional." />
-      <div className="grid max-w-6xl grid-cols-1 gap-5 p-6 lg:grid-cols-12 lg:p-10">
+      <div className="grid max-w-7xl grid-cols-1 gap-6 p-8 lg:grid-cols-12 lg:p-14">
         <div className="space-y-5 lg:col-span-5">
           <GoogleCalendarCard companyId={company?.id} />
           <HorarioAtendimentoCard companyId={company?.id} />

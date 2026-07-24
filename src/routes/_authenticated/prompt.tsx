@@ -145,7 +145,7 @@ function Page() {
         title="Prompt da IA"
         description="Explique como a IA deve se comportar, o tom de voz e as regras de atendimento."
       />
-      <div className="max-w-6xl p-6 lg:p-10">
+      <div className="max-w-7xl p-8 lg:p-14">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
           <div className="space-y-5 lg:col-span-5">
             <Card>

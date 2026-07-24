@@ -305,7 +305,7 @@ function Page() {
   return (
     <div>
       <PageHeader title="Produtos" description="Fotos, preços e disponibilidade que a IA usa para responder clientes." />
-      <div className="max-w-6xl p-6 lg:p-10">
+      <div className="max-w-7xl p-8 lg:p-14">
         <div className="mb-5 flex justify-end">
           <GradientButton
             onClick={() => {

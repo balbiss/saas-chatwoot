@@ -43,9 +43,9 @@ export function GradientButton({
 
 export function PageHeader({ title, description }: { title: string; description?: string }) {
   return (
-    <div className="border-b border-border/60 px-6 py-6 lg:px-10">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
-      {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+    <div className="sticky top-0 z-10 border-b border-border/60 bg-background/80 px-8 py-8 backdrop-blur-sm lg:px-14 lg:py-10">
+      <h1 className="text-2xl font-semibold tracking-tight text-foreground lg:text-3xl">{title}</h1>
+      {description && <p className="mt-1.5 text-sm text-muted-foreground">{description}</p>}
     </div>
   );
 }

@@ -127,7 +127,7 @@ function Page() {
   return (
     <div>
       <PageHeader title="Métricas" description="Funil de conversão e atendimento da IA." />
-      <div className="max-w-6xl space-y-6 p-6 lg:p-10">
+      <div className="max-w-7xl space-y-8 p-8 lg:p-14">
         <div className="flex gap-2">
           {PERIODS.map((p) => (
             <button
