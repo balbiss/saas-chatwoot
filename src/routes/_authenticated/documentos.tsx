@@ -2,11 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { FileText, Trash2, Upload, Video } from "lucide-react";
+import { Check, FileText, Pencil, Trash2, Upload, Video, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/lib/company";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { GradientButton, PageHeader } from "@/components/gradient-button";
 
 export const Route = createFileRoute("/_authenticated/documentos")({ component: Page });
@@ -16,6 +17,8 @@ function Page() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
 
   const { data: documents, isLoading } = useQuery({
     queryKey: ["company-documents", company?.id],
@@ -44,7 +47,11 @@ function Page() {
     }
     setUploading(true);
     try {
-      const path = `${company.id}/${Date.now()}-${file.name}`;
+      const safeName = file.name
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-zA-Z0-9._-]+/g, "-");
+      const path = `${company.id}/${Date.now()}-${safeName}`;
       const { error: uploadError } = await supabase.storage.from("company-documents").upload(path, file);
       if (uploadError) throw uploadError;
       const { data: signed } = await supabase.storage.from("company-documents").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
@@ -66,6 +73,31 @@ function Page() {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  };
+
+  const startRename = (id: string, currentTitle: string) => {
+    setEditingId(id);
+    setEditingTitle(currentTitle);
+  };
+
+  const cancelRename = () => {
+    setEditingId(null);
+    setEditingTitle("");
+  };
+
+  const saveRename = async (id: string) => {
+    if (!editingTitle.trim()) {
+      toast.error("O nome não pode ficar vazio.");
+      return;
+    }
+    const { error } = await supabase.from("company_documents").update({ title: editingTitle.trim() }).eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    queryClient.invalidateQueries({ queryKey: ["company-documents", company?.id] });
+    toast.success("Nome atualizado.");
+    cancelRename();
   };
 
   const handleDelete = async (id: string) => {
@@ -100,7 +132,10 @@ function Page() {
           <Upload className="size-4" />
           Enviar PDF ou vídeo
         </GradientButton>
-        <p className="mt-2 text-xs text-muted-foreground">Tamanho máximo: 50MB por arquivo.</p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Tamanho máximo: 50MB por arquivo — em vídeos isso costuma dar entre 1 e 3 minutos, dependendo da
+          qualidade da gravação. Se passar do limite, grave em resolução menor ou comprima antes de enviar.
+        </p>
 
         <div className="mt-6 space-y-2">
           {!isLoading && documents?.length === 0 && (
@@ -110,15 +145,42 @@ function Page() {
             const isVideo = doc.content_type?.startsWith("video/");
             const Icon = isVideo ? Video : FileText;
             return (
-              <Card key={doc.id} className="flex items-center justify-between p-4">
-                <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:underline">
-                  <Icon className="size-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">{doc.title}</span>
-                  <span className="text-xs text-muted-foreground">{isVideo ? "vídeo" : "PDF"}</span>
-                </a>
-                <Button variant="ghost" size="icon" onClick={() => handleDelete(doc.id)}>
-                  <Trash2 className="size-4" />
-                </Button>
+              <Card key={doc.id} className="flex items-center justify-between gap-3 p-4">
+                {editingId === doc.id ? (
+                  <div className="flex flex-1 items-center gap-2">
+                    <Icon className="size-4 shrink-0 text-muted-foreground" />
+                    <Input
+                      value={editingTitle}
+                      onChange={(e) => setEditingTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveRename(doc.id);
+                        if (e.key === "Escape") cancelRename();
+                      }}
+                      autoFocus
+                      className="h-8"
+                    />
+                    <Button variant="ghost" size="icon" onClick={() => saveRename(doc.id)}>
+                      <Check className="size-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={cancelRename}>
+                      <X className="size-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="flex flex-1 items-center gap-3 hover:underline">
+                      <Icon className="size-4 shrink-0 text-muted-foreground" />
+                      <span className="text-sm font-medium">{doc.title}</span>
+                      <span className="text-xs text-muted-foreground">{isVideo ? "vídeo" : "PDF"}</span>
+                    </a>
+                    <Button variant="ghost" size="icon" onClick={() => startRename(doc.id, doc.title)}>
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(doc.id)}>
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </>
+                )}
               </Card>
             );
           })}
