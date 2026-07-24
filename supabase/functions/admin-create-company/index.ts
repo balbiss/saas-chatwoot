@@ -22,6 +22,9 @@ const STANDARD_LABELS = [
   { title: "lead_quente", color: "#e74c3c" },
   { title: "lead_frio", color: "#5b7999" },
   { title: "desqualificado", color: "#7f8c8d" },
+  { title: "agente_off", color: "#c0392b" },
+  { title: "falar_humano", color: "#d35400" },
+  { title: "reengajado_frio", color: "#16a085" },
 ];
 
 function json(body: unknown, status = 200) {
