@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Clock, Sparkles, Wand2, UserRoundSearch } from "lucide-react";
+import { Clock, CreditCard, Sparkles, Wand2, UserRoundSearch } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany, useInvalidateCompany } from "@/lib/company";
 import { PROMPT_TEMPLATES } from "@/lib/prompt-templates";
@@ -28,6 +28,8 @@ function Page() {
   const [reengajamentoEnabled, setReengajamentoEnabled] = useState(false);
   const [diasInativo, setDiasInativo] = useState(3);
   const [savingReengajamento, setSavingReengajamento] = useState(false);
+  const [mercadoPagoToken, setMercadoPagoToken] = useState("");
+  const [savingMercadoPago, setSavingMercadoPago] = useState(false);
 
   useEffect(() => {
     if (company) {
@@ -36,6 +38,7 @@ function Page() {
       setMaxAttempts(company.followup_max_attempts ?? 3);
       setReengajamentoEnabled(company.reengajamento_enabled ?? false);
       setDiasInativo(company.reengajamento_dias_inativo ?? 3);
+      setMercadoPagoToken(company.mercadopago_access_token ?? "");
     }
   }, [company]);
 
@@ -72,6 +75,24 @@ function Page() {
       toast.error(err instanceof Error ? err.message : "Falha ao salvar reengajamento");
     } finally {
       setSavingReengajamento(false);
+    }
+  };
+
+  const handleSaveMercadoPago = async () => {
+    if (!company) return;
+    setSavingMercadoPago(true);
+    try {
+      const { error } = await supabase
+        .from("companies")
+        .update({ mercadopago_access_token: mercadoPagoToken.trim() || null })
+        .eq("id", company.id);
+      if (error) throw error;
+      invalidateCompany();
+      toast.success("Token do Mercado Pago salvo.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao salvar o token do Mercado Pago");
+    } finally {
+      setSavingMercadoPago(false);
     }
   };
 
@@ -254,6 +275,60 @@ function Page() {
                 <div className="mt-3 flex justify-end">
                   <GradientButton onClick={handleSaveReengajamento} loading={savingReengajamento} disabled={isLoading}>
                     Salvar reengajamento
+                  </GradientButton>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <CreditCard className="size-4 text-primary" />
+                  Mercado Pago
+                </CardTitle>
+                <CardDescription>
+                  Ative pagamento automático via Pix: a IA gera a cobrança, confirma o pagamento sozinha e libera
+                  o produto — sem você precisar fazer nada manualmente.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-3 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+                  <p className="mb-1 font-medium text-foreground">Como configurar:</p>
+                  <ol className="list-decimal space-y-1 pl-4">
+                    <li>
+                      Entre em <span className="font-medium text-foreground">developers.mercadopago.com.br</span> →
+                      Suas integrações → sua aplicação → Credenciais.
+                    </li>
+                    <li>Copie o <span className="font-medium text-foreground">Access Token de produção</span> e cole abaixo.</li>
+                    <li>
+                      Vá em <span className="font-medium text-foreground">Produtos</span> e ative "Vender com Pix
+                      automático" em cada produto que quiser vender assim.
+                    </li>
+                  </ol>
+                  <p className="mt-2 font-medium text-foreground">Como funciona depois de configurado:</p>
+                  <ul className="list-disc space-y-1 pl-4">
+                    <li>A IA só gera o Pix depois que o cliente confirmar que quer comprar — nunca sozinha.</li>
+                    <li>Confere o estoque antes de gerar a cobrança (se tiver zerado, avisa o cliente e não cobra).</li>
+                    <li>
+                      Você não precisa configurar nada no site do Mercado Pago além do token — o aviso de pagamento
+                      é registrado automaticamente a cada cobrança.
+                    </li>
+                    <li>Quando o Mercado Pago confirma o pagamento, a IA entrega o produto na hora (se for digital) ou avisa o time de vendas (se for físico).</li>
+                    <li>Se o cliente não pagar dentro de ~30 minutos, a IA manda um lembrete perguntando se ainda quer comprar.</li>
+                  </ul>
+                </div>
+                <Label htmlFor="mp_token">Access Token</Label>
+                <Input
+                  id="mp_token"
+                  type="password"
+                  value={mercadoPagoToken}
+                  onChange={(e) => setMercadoPagoToken(e.target.value)}
+                  placeholder="APP_USR-..."
+                  autoComplete="off"
+                />
+                <div className="mt-3 flex justify-end">
+                  <GradientButton onClick={handleSaveMercadoPago} loading={savingMercadoPago} disabled={isLoading}>
+                    Salvar Mercado Pago
                   </GradientButton>
                 </div>
               </CardContent>

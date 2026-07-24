@@ -265,6 +265,7 @@ export type Database = {
           horario_atendimento_fim: string
           horario_atendimento_inicio: string
           id: string
+          mercadopago_access_token: string | null
           name: string | null
           reengajamento_dias_inativo: number
           reengajamento_enabled: boolean
@@ -284,6 +285,7 @@ export type Database = {
           horario_atendimento_fim?: string
           horario_atendimento_inicio?: string
           id?: string
+          mercadopago_access_token?: string | null
           name?: string | null
           reengajamento_dias_inativo?: number
           reengajamento_enabled?: boolean
@@ -303,6 +305,7 @@ export type Database = {
           horario_atendimento_fim?: string
           horario_atendimento_inicio?: string
           id?: string
+          mercadopago_access_token?: string | null
           name?: string | null
           reengajamento_dias_inativo?: number
           reengajamento_enabled?: boolean
@@ -560,40 +563,97 @@ export type Database = {
       }
       products: {
         Row: {
+          arquivo_digital_url: string | null
           available: boolean
           category: string | null
           company_id: string
           created_at: string
           description: string | null
+          estoque: number | null
           id: string
           name: string
           photo_url: string | null
           price: number | null
+          tipo: string
           updated_at: string
+          vender_com_pix: boolean
         }
         Insert: {
+          arquivo_digital_url?: string | null
           available?: boolean
           category?: string | null
           company_id: string
           created_at?: string
           description?: string | null
+          estoque?: number | null
           id?: string
           name: string
           photo_url?: string | null
           price?: number | null
+          tipo?: string
           updated_at?: string
+          vender_com_pix?: boolean
         }
         Update: {
+          arquivo_digital_url?: string | null
           available?: boolean
           category?: string | null
           company_id?: string
           created_at?: string
           description?: string | null
+          estoque?: number | null
           id?: string
           name?: string
           photo_url?: string | null
           price?: number | null
+          tipo?: string
           updated_at?: string
+          vender_com_pix?: boolean
+        }
+        Relationships: []
+      }
+      pedidos: {
+        Row: {
+          company_id: string
+          contact_phone: string | null
+          conversation_id: string | null
+          created_at: string
+          expira_em: string | null
+          id: string
+          lembrete_enviado: boolean
+          mercadopago_payment_id: string | null
+          product_id: string
+          status: string
+          updated_at: string
+          valor: number | null
+        }
+        Insert: {
+          company_id: string
+          contact_phone?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          expira_em?: string | null
+          id?: string
+          lembrete_enviado?: boolean
+          mercadopago_payment_id?: string | null
+          product_id: string
+          status?: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Update: {
+          company_id?: string
+          contact_phone?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          expira_em?: string | null
+          id?: string
+          lembrete_enviado?: boolean
+          mercadopago_payment_id?: string | null
+          product_id?: string
+          status?: string
+          updated_at?: string
+          valor?: number | null
         }
         Relationships: []
       }

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ImagePlus, Pencil, Plus, Trash2 } from "lucide-react";
+import { FileText, ImagePlus, Pencil, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/lib/company";
 import type { Tables } from "@/integrations/supabase/types";
@@ -13,6 +13,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -26,7 +33,25 @@ export const Route = createFileRoute("/_authenticated/produtos")({ component: Pa
 
 type Product = Tables<"products">;
 
-const EMPTY_FORM = { name: "", description: "", price: "", category: "", available: true };
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+
+function sanitizeFileName(name: string) {
+  return name
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-zA-Z0-9._-]+/g, "-");
+}
+
+const EMPTY_FORM = {
+  name: "",
+  description: "",
+  price: "",
+  category: "",
+  available: true,
+  tipo: "fisico" as "fisico" | "digital",
+  estoque: "",
+  vender_com_pix: false,
+};
 
 function ProductDialog({
   companyId,
@@ -49,10 +74,14 @@ function ProductDialog({
           price: product.price != null ? String(product.price) : "",
           category: product.category ?? "",
           available: product.available,
+          tipo: (product.tipo as "fisico" | "digital") ?? "fisico",
+          estoque: product.estoque != null ? String(product.estoque) : "",
+          vender_com_pix: product.vender_com_pix ?? false,
         }
       : EMPTY_FORM,
   );
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [digitalFile, setDigitalFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
@@ -60,16 +89,33 @@ function ProductDialog({
       toast.error("Nome é obrigatório");
       return;
     }
+    if (digitalFile && digitalFile.size > MAX_FILE_SIZE) {
+      toast.error(`Arquivo digital muito grande (${(digitalFile.size / 1024 / 1024).toFixed(1)}MB). Limite: 50MB.`);
+      return;
+    }
     setSaving(true);
     try {
       let photo_url = product?.photo_url ?? null;
       if (photoFile) {
-        const path = `${companyId}/${Date.now()}-${photoFile.name}`;
+        const path = `${companyId}/${Date.now()}-${sanitizeFileName(photoFile.name)}`;
         const { error: uploadError } = await supabase.storage
           .from("product-photos")
           .upload(path, photoFile, { upsert: true });
         if (uploadError) throw uploadError;
         photo_url = supabase.storage.from("product-photos").getPublicUrl(path).data.publicUrl;
+      }
+
+      let arquivo_digital_url = product?.arquivo_digital_url ?? null;
+      if (form.tipo === "digital" && digitalFile) {
+        const path = `${companyId}/${Date.now()}-${sanitizeFileName(digitalFile.name)}`;
+        const { error: uploadError } = await supabase.storage
+          .from("company-documents")
+          .upload(path, digitalFile, { upsert: true });
+        if (uploadError) throw uploadError;
+        const { data: signed } = await supabase.storage
+          .from("company-documents")
+          .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+        arquivo_digital_url = signed?.signedUrl ?? path;
       }
 
       const payload = {
@@ -80,6 +126,10 @@ function ProductDialog({
         category: form.category.trim() || null,
         available: form.available,
         photo_url,
+        tipo: form.tipo,
+        estoque: form.estoque.trim() ? Number(form.estoque) : null,
+        vender_com_pix: form.vender_com_pix,
+        arquivo_digital_url: form.tipo === "digital" ? arquivo_digital_url : null,
       };
 
       const { error } = product
@@ -99,7 +149,7 @@ function ProductDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{product ? "Editar produto" : "Novo produto"}</DialogTitle>
         </DialogHeader>
@@ -147,6 +197,68 @@ function ProductDialog({
           <div className="flex items-center gap-3">
             <Switch checked={form.available} onCheckedChange={(v) => setForm((f) => ({ ...f, available: v }))} />
             <Label>Disponível</Label>
+          </div>
+
+          <div className="rounded-lg border border-border/60 p-3">
+            <p className="mb-3 text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">Venda automática (opcional):</span> configure aqui se
+              quiser que a IA cobre e libere esse produto sozinha via Pix. Pra funcionar, cadastre o token do
+              Mercado Pago em <span className="font-medium text-foreground">Prompt da IA</span>.
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Tipo de produto</Label>
+                <Select value={form.tipo} onValueChange={(v) => setForm((f) => ({ ...f, tipo: v as "fisico" | "digital" }))}>
+                  <SelectTrigger className="mt-1.5">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fisico">Físico</SelectItem>
+                    <SelectItem value="digital">Digital</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="p_estoque">Estoque (vazio = ilimitado)</Label>
+                <Input
+                  id="p_estoque"
+                  type="number"
+                  min={0}
+                  value={form.estoque}
+                  onChange={(e) => setForm((f) => ({ ...f, estoque: e.target.value }))}
+                  className="mt-1.5"
+                />
+              </div>
+            </div>
+
+            {form.tipo === "digital" && (
+              <div className="mt-3">
+                <Label htmlFor="p_digital">Arquivo digital (entregue automaticamente após pagamento)</Label>
+                <Input
+                  id="p_digital"
+                  type="file"
+                  onChange={(e) => setDigitalFile(e.target.files?.[0] ?? null)}
+                  className="mt-1.5"
+                />
+                {product?.arquivo_digital_url && !digitalFile && (
+                  <p className="mt-1 text-xs text-muted-foreground">Já tem um arquivo enviado. Escolha outro só se quiser trocar.</p>
+                )}
+              </div>
+            )}
+
+            <div className="mt-3 flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2.5">
+              <Label htmlFor="p_pix" className="cursor-pointer">
+                Vender com Pix automático (Mercado Pago)
+              </Label>
+              <Switch
+                id="p_pix"
+                checked={form.vender_com_pix}
+                onCheckedChange={(v) => setForm((f) => ({ ...f, vender_com_pix: v }))}
+              />
+            </div>
+            {form.vender_com_pix && !form.price && (
+              <p className="mt-2 text-xs text-destructive">Defina um preço pra poder vender com Pix.</p>
+            )}
           </div>
         </div>
         <DialogFooter>
@@ -234,6 +346,24 @@ function Page() {
                     {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(product.price)}
                   </p>
                 )}
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {product.tipo === "digital" && (
+                    <Badge variant="outline" className="gap-1 text-[10px]">
+                      <FileText className="size-3" />
+                      Digital
+                    </Badge>
+                  )}
+                  {product.vender_com_pix && (
+                    <Badge variant="outline" className="text-[10px] text-primary">
+                      Pix automático
+                    </Badge>
+                  )}
+                  {product.estoque != null && (
+                    <Badge variant="outline" className="text-[10px]">
+                      Estoque: {product.estoque}
+                    </Badge>
+                  )}
+                </div>
                 <div className="mt-3 flex gap-2">
                   <Button
                     variant="outline"

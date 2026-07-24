@@ -24,7 +24,9 @@ const STANDARD_LABELS = [
   { title: "desqualificado", color: "#7f8c8d" },
   { title: "agente_off", color: "#c0392b" },
   { title: "falar_humano", color: "#d35400" },
+  { title: "pago", color: "#27ae60" },
   { title: "reengajado_frio", color: "#16a085" },
+  { title: "aguardando_nps", color: "#9b59b6" },
 ];
 
 function json(body: unknown, status = 200) {

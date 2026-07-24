@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-import { Users, CalendarClock, CheckCircle2, MessagesSquare, Timer, Bot } from "lucide-react";
+import { Users, CalendarClock, CheckCircle2, MessagesSquare, Timer, Bot, ShoppingBag, Wallet, Receipt } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/lib/company";
 import { StatTile } from "@/components/ui/stat-tile";
@@ -27,6 +27,23 @@ type MetricsResponse = {
   resolved_by_ai_pct: number | null;
   daily_volume: { date: string; count: number }[];
 };
+
+async function fetchSalesData(companyId: string, sinceIso: string) {
+  const { data, error } = await supabase
+    .from("pedidos")
+    .select("valor")
+    .eq("company_id", companyId)
+    .eq("status", "pago")
+    .gte("created_at", sinceIso);
+  if (error) throw error;
+  const vendas = data ?? [];
+  const total = vendas.reduce((sum, p) => sum + (p.valor ?? 0), 0);
+  return {
+    quantidade: vendas.length,
+    total,
+    ticketMedio: vendas.length > 0 ? total / vendas.length : 0,
+  };
+}
 
 async function fetchFunnelData(companyId: string, sinceIso: string) {
   const [leadsRes, appointmentsRes, confirmedRes] = await Promise.all([
@@ -79,6 +96,12 @@ function Page() {
   const { data: funnel, isLoading: loadingFunnel } = useQuery({
     queryKey: ["metrics-funnel", company?.id, days],
     queryFn: () => fetchFunnelData(company!.id, sinceIso),
+    enabled: !!company?.id,
+  });
+
+  const { data: sales, isLoading: loadingSales } = useQuery({
+    queryKey: ["metrics-sales", company?.id, days],
+    queryFn: () => fetchSalesData(company!.id, sinceIso),
     enabled: !!company?.id,
   });
 
@@ -149,6 +172,35 @@ function Page() {
               <Progress value={conversionRate} />
             </CardContent>
           </Card>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Vendas</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <StatTile
+              icon={ShoppingBag}
+              label="Vendas pagas"
+              value={loadingSales ? "…" : sales?.quantidade ?? 0}
+            />
+            <StatTile
+              icon={Wallet}
+              label="Total arrecadado"
+              value={
+                loadingSales
+                  ? "…"
+                  : new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(sales?.total ?? 0)
+              }
+            />
+            <StatTile
+              icon={Receipt}
+              label="Ticket médio"
+              value={
+                loadingSales
+                  ? "…"
+                  : new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(sales?.ticketMedio ?? 0)
+              }
+            />
+          </div>
         </section>
 
         <section>
