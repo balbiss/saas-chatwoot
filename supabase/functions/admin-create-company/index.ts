@@ -27,6 +27,8 @@ const STANDARD_LABELS = [
   { title: "pago", color: "#27ae60" },
   { title: "reengajado_frio", color: "#16a085" },
   { title: "aguardando_nps", color: "#9b59b6" },
+  { title: "followup_ativo", color: "#95a5a6" },
+  { title: "aguardando_pagamento", color: "#f39c12" },
 ];
 
 function json(body: unknown, status = 200) {

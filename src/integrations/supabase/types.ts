@@ -468,27 +468,96 @@ export type Database = {
           calendar_id: string | null
           company_id: string
           created_at: string
+          exige_pagamento: boolean
           id: string
           name: string
           updated_at: string
+          valor_sinal: number | null
         }
         Insert: {
           active?: boolean
           calendar_id?: string | null
           company_id: string
           created_at?: string
+          exige_pagamento?: boolean
           id?: string
           name: string
           updated_at?: string
+          valor_sinal?: number | null
         }
         Update: {
           active?: boolean
           calendar_id?: string | null
           company_id?: string
           created_at?: string
+          exige_pagamento?: boolean
           id?: string
           name?: string
           updated_at?: string
+          valor_sinal?: number | null
+        }
+        Relationships: []
+      }
+      agendamento_pagamentos: {
+        Row: {
+          company_id: string
+          contact_phone: string | null
+          conversation_id: string | null
+          created_at: string
+          data_hora_inicio: string
+          descricao: string | null
+          expira_em: string | null
+          id: string
+          lembrete_enviado: boolean
+          mercadopago_payment_id: string | null
+          nome_lead: string | null
+          resource_id: string
+          status: string
+          telefone: string | null
+          termo_contato: string | null
+          titulo: string | null
+          updated_at: string
+          valor: number | null
+        }
+        Insert: {
+          company_id: string
+          contact_phone?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          data_hora_inicio: string
+          descricao?: string | null
+          expira_em?: string | null
+          id?: string
+          lembrete_enviado?: boolean
+          mercadopago_payment_id?: string | null
+          nome_lead?: string | null
+          resource_id: string
+          status?: string
+          telefone?: string | null
+          termo_contato?: string | null
+          titulo?: string | null
+          updated_at?: string
+          valor?: number | null
+        }
+        Update: {
+          company_id?: string
+          contact_phone?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          data_hora_inicio?: string
+          descricao?: string | null
+          expira_em?: string | null
+          id?: string
+          lembrete_enviado?: boolean
+          mercadopago_payment_id?: string | null
+          nome_lead?: string | null
+          resource_id?: string
+          status?: string
+          telefone?: string | null
+          termo_contato?: string | null
+          titulo?: string | null
+          updated_at?: string
+          valor?: number | null
         }
         Relationships: []
       }

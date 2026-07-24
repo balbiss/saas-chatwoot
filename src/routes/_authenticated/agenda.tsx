@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dialog";
 import { GradientButton, PageHeader } from "@/components/gradient-button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/agenda")({ component: Page });
@@ -207,6 +208,8 @@ type ResourceForm = {
   duracao_minutos: number;
   buffer_minutos: number;
   max_por_dia: number | null;
+  exige_pagamento: boolean;
+  valor_sinal: string;
 };
 
 const DEFAULT_FORM: ResourceForm = {
@@ -219,6 +222,8 @@ const DEFAULT_FORM: ResourceForm = {
   duracao_minutos: 30,
   buffer_minutos: 0,
   max_por_dia: null,
+  exige_pagamento: false,
+  valor_sinal: "",
 };
 
 function ResourceDialog({
@@ -246,6 +251,8 @@ function ResourceDialog({
           duracao_minutos: resource.agenda_config?.duracao_minutos ?? DEFAULT_FORM.duracao_minutos,
           buffer_minutos: resource.agenda_config?.buffer_minutos ?? DEFAULT_FORM.buffer_minutos,
           max_por_dia: resource.agenda_config?.max_por_dia ?? null,
+          exige_pagamento: resource.exige_pagamento,
+          valor_sinal: resource.valor_sinal != null ? String(resource.valor_sinal) : "",
         }
       : DEFAULT_FORM,
   );
@@ -265,6 +272,10 @@ function ResourceDialog({
       toast.error("Nome do profissional é obrigatório");
       return;
     }
+    if (form.exige_pagamento && !(Number(form.valor_sinal) > 0)) {
+      toast.error("Informe o valor do sinal/pagamento (maior que zero)");
+      return;
+    }
     setSaving(true);
     try {
       const resourcePayload = {
@@ -272,6 +283,8 @@ function ResourceDialog({
         name: form.name.trim(),
         calendar_id: form.calendar_id.trim() || null,
         active: form.active,
+        exige_pagamento: form.exige_pagamento,
+        valor_sinal: form.exige_pagamento ? Number(form.valor_sinal) : null,
       };
 
       let resourceId = resource?.id;
@@ -425,6 +438,42 @@ function ResourceDialog({
               className="mt-1.5 max-w-[160px]"
             />
           </div>
+
+          <div className="rounded-lg border border-border/60 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="r_exige_pagamento">Cobrar pagamento antes de confirmar agendamento</Label>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  O cliente paga um Pix (sinal ou valor da visita) antes do horário ser confirmado de verdade.
+                </p>
+              </div>
+              <Switch
+                id="r_exige_pagamento"
+                checked={form.exige_pagamento}
+                onCheckedChange={(v) => setForm((f) => ({ ...f, exige_pagamento: v }))}
+              />
+            </div>
+            {form.exige_pagamento && (
+              <div className="mt-4">
+                <Label htmlFor="r_valor_sinal">Valor do sinal/pagamento (R$)</Label>
+                <Input
+                  id="r_valor_sinal"
+                  type="number"
+                  min={0.01}
+                  step={0.01}
+                  value={form.valor_sinal}
+                  onChange={(e) => setForm((f) => ({ ...f, valor_sinal: e.target.value }))}
+                  placeholder="Ex: 50.00"
+                  className="mt-1.5 max-w-[160px]"
+                />
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Usa o mesmo Mercado Pago já configurado na página Prompt da IA. Ao pedir esse horário, a IA avisa
+                  o cliente do valor, manda um Pix e só confirma o agendamento (evento no Google Calendar) depois
+                  que o pagamento cai. Se o cliente não pagar a tempo, ele recebe um lembrete automático.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
         <DialogFooter>
           <GradientButton onClick={handleSave} loading={saving}>
@@ -504,6 +553,11 @@ function ResourcesSection({ companyId }: { companyId: string | undefined }) {
                     {!resource.active && (
                       <Badge variant="secondary" className="ml-2 align-middle text-[10px] uppercase tracking-wide">
                         Inativo
+                      </Badge>
+                    )}
+                    {resource.exige_pagamento && (
+                      <Badge className="ml-2 align-middle text-[10px] uppercase tracking-wide">
+                        Cobra R$ {Number(resource.valor_sinal).toFixed(2).replace(".", ",")}
                       </Badge>
                     )}
                   </p>
