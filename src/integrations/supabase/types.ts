@@ -687,6 +687,33 @@ export type Database = {
         }
         Relationships: []
       }
+      product_media: {
+        Row: {
+          created_at: string
+          id: string
+          ordem: number
+          product_id: string
+          tipo: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ordem?: number
+          product_id: string
+          tipo?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ordem?: number
+          product_id?: string
+          tipo?: string
+          url?: string
+        }
+        Relationships: []
+      }
       pedidos: {
         Row: {
           company_id: string

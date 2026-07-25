@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { FileText, ImagePlus, Pencil, Plus, Trash2 } from "lucide-react";
+import { FileText, ImagePlus, Images, Pencil, Plus, Trash2, Video, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/lib/company";
 import type { Tables } from "@/integrations/supabase/types";
@@ -31,7 +31,8 @@ import { GradientButton, PageHeader } from "@/components/gradient-button";
 
 export const Route = createFileRoute("/_authenticated/produtos")({ component: Page });
 
-type Product = Tables<"products">;
+type ProductMedia = Tables<"product_media">;
+type Product = Tables<"products"> & { product_media?: ProductMedia[] };
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
@@ -82,6 +83,11 @@ function ProductDialog({
   );
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [digitalFile, setDigitalFile] = useState<File | null>(null);
+  const [existingMedia, setExistingMedia] = useState<ProductMedia[]>(
+    () => [...(product?.product_media ?? [])].sort((a, b) => a.ordem - b.ordem),
+  );
+  const [removedMediaIds, setRemovedMediaIds] = useState<string[]>([]);
+  const [newMediaFiles, setNewMediaFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
@@ -91,6 +97,11 @@ function ProductDialog({
     }
     if (digitalFile && digitalFile.size > MAX_FILE_SIZE) {
       toast.error(`Arquivo digital muito grande (${(digitalFile.size / 1024 / 1024).toFixed(1)}MB). Limite: 50MB.`);
+      return;
+    }
+    const oversizedMedia = newMediaFiles.find((f) => f.size > MAX_FILE_SIZE);
+    if (oversizedMedia) {
+      toast.error(`"${oversizedMedia.name}" muito grande (${(oversizedMedia.size / 1024 / 1024).toFixed(1)}MB). Limite: 50MB.`);
       return;
     }
     setSaving(true);
@@ -132,10 +143,38 @@ function ProductDialog({
         arquivo_digital_url: form.tipo === "digital" ? arquivo_digital_url : null,
       };
 
-      const { error } = product
-        ? await supabase.from("products").update(payload).eq("id", product.id)
-        : await supabase.from("products").insert(payload);
-      if (error) throw error;
+      let productId = product?.id;
+      if (product) {
+        const { error } = await supabase.from("products").update(payload).eq("id", product.id);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from("products").insert(payload).select("id").single();
+        if (error) throw error;
+        productId = data.id;
+      }
+
+      if (removedMediaIds.length) {
+        const { error: removeError } = await supabase.from("product_media").delete().in("id", removedMediaIds);
+        if (removeError) throw removeError;
+      }
+
+      if (newMediaFiles.length) {
+        const baseOrdem = existingMedia.length;
+        for (let i = 0; i < newMediaFiles.length; i++) {
+          const file = newMediaFiles[i];
+          const path = `${companyId}/${productId}/${Date.now()}-${sanitizeFileName(file.name)}`;
+          const { error: uploadError } = await supabase.storage.from("product-photos").upload(path, file, { upsert: true });
+          if (uploadError) throw uploadError;
+          const url = supabase.storage.from("product-photos").getPublicUrl(path).data.publicUrl;
+          const { error: insertError } = await supabase.from("product_media").insert({
+            product_id: productId,
+            url,
+            tipo: file.type.startsWith("video/") ? "video" : "foto",
+            ordem: baseOrdem + i,
+          });
+          if (insertError) throw insertError;
+        }
+      }
 
       toast.success(product ? "Produto atualizado." : "Produto criado.");
       onSaved();
@@ -191,9 +230,64 @@ function ProductDialog({
             </div>
           </div>
           <div>
-            <Label htmlFor="p_photo">Foto</Label>
+            <Label htmlFor="p_photo">Foto de capa</Label>
             <Input id="p_photo" type="file" accept="image/*" onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)} className="mt-1.5" />
           </div>
+
+          <div>
+            <Label>Fotos/vídeos adicionais (opcional)</Label>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Além da foto de capa, a IA manda estes também quando o cliente pedir pra ver mais. Aceita vídeo
+              (limite de 50MB por arquivo).
+            </p>
+            {(existingMedia.length > 0 || newMediaFiles.length > 0) && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {existingMedia.map((m) => (
+                  <div key={m.id} className="relative flex size-16 items-center justify-center overflow-hidden rounded-lg border border-border/60 bg-muted">
+                    {m.tipo === "video" ? (
+                      <Video className="size-5 text-muted-foreground" />
+                    ) : (
+                      <img src={m.url} alt="" className="h-full w-full object-cover" />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setExistingMedia((list) => list.filter((x) => x.id !== m.id));
+                        setRemovedMediaIds((ids) => [...ids, m.id]);
+                      }}
+                      className="absolute right-0.5 top-0.5 rounded-full bg-background/80 p-0.5 text-foreground"
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </div>
+                ))}
+                {newMediaFiles.map((f, i) => (
+                  <div key={i} className="relative flex size-16 items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted">
+                    {f.type.startsWith("video/") ? (
+                      <Video className="size-5 text-muted-foreground" />
+                    ) : (
+                      <ImagePlus className="size-5 text-muted-foreground" />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setNewMediaFiles((files) => files.filter((_, idx) => idx !== i))}
+                      className="absolute right-0.5 top-0.5 rounded-full bg-background/80 p-0.5 text-foreground"
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Input
+              type="file"
+              accept="image/*,video/*"
+              multiple
+              onChange={(e) => setNewMediaFiles((files) => [...files, ...Array.from(e.target.files ?? [])])}
+              className="mt-2"
+            />
+          </div>
+
           <div className="flex items-center gap-3">
             <Switch checked={form.available} onCheckedChange={(v) => setForm((f) => ({ ...f, available: v }))} />
             <Label>Disponível</Label>
@@ -282,11 +376,11 @@ function Page() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("*")
+        .select("*, product_media(*)")
         .eq("company_id", company!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return data as Product[];
     },
     enabled: !!company?.id,
   });
@@ -361,6 +455,11 @@ function Page() {
                   {product.estoque != null && (
                     <Badge variant="outline" className="text-[10px]">
                       Estoque: {product.estoque}
+                    </Badge>
+                  )}
+                  {(product.product_media?.length ?? 0) > 0 && (
+                    <Badge variant="outline" className="gap-1 text-[10px]">
+                      <Images className="size-3" />+{product.product_media!.length}
                     </Badge>
                   )}
                 </div>
