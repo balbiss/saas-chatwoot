@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: {}
 
 jobs:
   build:
@@ -37,3 +38,7 @@ jobs:
           file: Dockerfile
           push: true
           tags: ghcr.io/${{ env.REPO }}:latest
+          build-args: |
+            VITE_SUPABASE_URL=${{ vars.VITE_SUPABASE_URL }}
+            VITE_SUPABASE_PROJECT_ID=${{ vars.VITE_SUPABASE_PROJECT_ID }}
+            VITE_SUPABASE_PUBLISHABLE_KEY=${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}

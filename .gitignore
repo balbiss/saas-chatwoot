@@ -20,6 +20,10 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Segredos locais do script de setup do Supabase (supabase/setup.sh)
+supabase/setup.env
+supabase/.temp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
