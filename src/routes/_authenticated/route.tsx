@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   LogOut,
   Menu,
+  Headset,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -35,6 +36,7 @@ const NAV_ITEMS = [
   { to: "/produtos", label: "Produtos", icon: Package },
   { to: "/documentos", label: "Documentos", icon: FileText },
   { to: "/leads", label: "Leads", icon: Users },
+  { to: "/atendentes", label: "Atendentes", icon: Headset },
 ] as const;
 
 async function fetchIsAdmin(): Promise<boolean> {

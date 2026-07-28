@@ -19,6 +19,7 @@ import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedMetricasRouteImport } from './routes/_authenticated/metricas'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
+import { Route as AuthenticatedAtendentesRouteImport } from './routes/_authenticated/atendentes'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 
 const AuthRoute = AuthRouteImport.update({
@@ -70,6 +71,11 @@ const AuthenticatedDocumentosRoute = AuthenticatedDocumentosRouteImport.update({
   path: '/documentos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAtendentesRoute = AuthenticatedAtendentesRouteImport.update({
+  id: '/atendentes',
+  path: '/atendentes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
   id: '/agenda',
   path: '/agenda',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/agenda': typeof AuthenticatedAgendaRoute
+  '/atendentes': typeof AuthenticatedAtendentesRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/metricas': typeof AuthenticatedMetricasRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/agenda': typeof AuthenticatedAgendaRoute
+  '/atendentes': typeof AuthenticatedAtendentesRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/metricas': typeof AuthenticatedMetricasRoute
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
+  '/_authenticated/atendentes': typeof AuthenticatedAtendentesRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRoute
   '/_authenticated/metricas': typeof AuthenticatedMetricasRoute
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/agenda'
+    | '/atendentes'
     | '/documentos'
     | '/leads'
     | '/metricas'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/agenda'
+    | '/atendentes'
     | '/documentos'
     | '/leads'
     | '/metricas'
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/_authenticated/agenda'
+    | '/_authenticated/atendentes'
     | '/_authenticated/documentos'
     | '/_authenticated/leads'
     | '/_authenticated/metricas'
@@ -230,6 +242,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDocumentosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/atendentes': {
+      id: '/_authenticated/atendentes'
+      path: '/atendentes'
+      fullPath: '/atendentes'
+      preLoaderRoute: typeof AuthenticatedAtendentesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/agenda': {
       id: '/_authenticated/agenda'
       path: '/agenda'
@@ -242,6 +261,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
+  AuthenticatedAtendentesRoute: typeof AuthenticatedAtendentesRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
   AuthenticatedMetricasRoute: typeof AuthenticatedMetricasRoute
@@ -252,6 +272,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
+  AuthenticatedAtendentesRoute: AuthenticatedAtendentesRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
   AuthenticatedMetricasRoute: AuthenticatedMetricasRoute,
