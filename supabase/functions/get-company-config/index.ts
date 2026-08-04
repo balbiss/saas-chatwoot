@@ -30,33 +30,57 @@ Deno.serve(async (req: Request) => {
 
   try {
     const url = new URL(req.url);
-    let phoneParam = url.searchParams.get("phone");
-
+    const phoneParam = url.searchParams.get("phone");
     const accountId = url.searchParams.get("account_id");
     const inboxId = url.searchParams.get("inbox_id");
-    if (!phoneParam && accountId && inboxId) {
-      const inboxResp = await fetch(
-        `${CHATWOOT_BASE_URL}/api/v1/accounts/${accountId}/inboxes/${inboxId}`,
-        { headers: { api_access_token: CHATWOOT_API_TOKEN } },
-      );
-      if (!inboxResp.ok) return json({ error: "Não foi possível buscar o inbox no Chatwoot" }, 502);
-      const inbox = await inboxResp.json();
-      phoneParam = inbox.phone_number ?? null;
+
+    if (!phoneParam && !accountId && !inboxId) {
+      return json({ error: "Informe 'phone' ou 'account_id'+'inbox_id'" }, 400);
     }
 
-    if (!phoneParam) return json({ error: "Informe 'phone' ou 'account_id'+'inbox_id'" }, 400);
-
-    const phoneDigits = onlyDigits(phoneParam);
-    if (!phoneDigits) return json({ error: "Número de telefone inválido" }, 400);
-
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const { data: companies, error } = await supabase
-      .from("companies")
-      .select("id, name, ai_prompt, whatsapp_phone, due_date, followup_wait_hours, followup_max_attempts")
-      .not("whatsapp_phone", "is", null);
-    if (error) throw error;
+    const selectFields = "id, name, ai_prompt, whatsapp_phone, due_date, followup_wait_hours, followup_max_attempts";
 
-    const company = companies.find((c) => onlyDigits(c.whatsapp_phone ?? "") === phoneDigits);
+    // Casar por inbox_id é mais confiável que por telefone (sobrevive a troca de
+    // número que ainda não propagou, ou a diferenças de formatação) -- só cai pro
+    // telefone se não achar por aqui, pra não quebrar chamadas antigas que só mandam 'phone'.
+    let company = null;
+    if (accountId && inboxId) {
+      const { data, error } = await supabase
+        .from("companies")
+        .select(selectFields)
+        .eq("chatwoot_account_id", accountId)
+        .eq("chatwoot_inbox_id", inboxId)
+        .maybeSingle();
+      if (error) throw error;
+      company = data;
+    }
+
+    if (!company) {
+      let phoneToMatch = phoneParam;
+      if (!phoneToMatch && accountId && inboxId) {
+        const inboxResp = await fetch(
+          `${CHATWOOT_BASE_URL}/api/v1/accounts/${accountId}/inboxes/${inboxId}`,
+          { headers: { api_access_token: CHATWOOT_API_TOKEN } },
+        );
+        if (!inboxResp.ok) return json({ error: "Não foi possível buscar o inbox no Chatwoot" }, 502);
+        const inbox = await inboxResp.json();
+        phoneToMatch = inbox.phone_number ?? null;
+      }
+
+      if (!phoneToMatch) return json({ error: "Informe 'phone' ou 'account_id'+'inbox_id'" }, 400);
+      const phoneDigits = onlyDigits(phoneToMatch);
+      if (!phoneDigits) return json({ error: "Número de telefone inválido" }, 400);
+
+      const { data: companies, error } = await supabase
+        .from("companies")
+        .select(selectFields)
+        .not("whatsapp_phone", "is", null);
+      if (error) throw error;
+
+      company = companies.find((c: { whatsapp_phone: string | null }) => onlyDigits(c.whatsapp_phone ?? "") === phoneDigits) ?? null;
+    }
+
     if (!company) return json({ error: "Empresa não encontrada para esse número" }, 404);
 
     // Vencida: a IA para de responder, mas o Chatwoot/painel continuam

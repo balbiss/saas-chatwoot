@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Clock, CreditCard, Sparkles, Wand2, UserRoundSearch } from "lucide-react";
+import { Clock, CreditCard, Sparkles, Wand2, UserRoundSearch, Smartphone, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany, useInvalidateCompany } from "@/lib/company";
 import { PROMPT_TEMPLATES } from "@/lib/prompt-templates";
@@ -12,6 +12,8 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { GradientButton, PageHeader } from "@/components/gradient-button";
 import { cn } from "@/lib/utils";
+
+const CHATWOOT_DASHBOARD_URL = "https://crm.inoovaweb.com.br";
 
 export const Route = createFileRoute("/_authenticated/prompt")({ component: Page });
 
@@ -30,6 +32,9 @@ function Page() {
   const [savingReengajamento, setSavingReengajamento] = useState(false);
   const [mercadoPagoToken, setMercadoPagoToken] = useState("");
   const [savingMercadoPago, setSavingMercadoPago] = useState(false);
+  const [newPhone, setNewPhone] = useState("");
+  const [savingPhone, setSavingPhone] = useState(false);
+  const [qrScanUrl, setQrScanUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (company) {
@@ -93,6 +98,39 @@ function Page() {
       toast.error(err instanceof Error ? err.message : "Falha ao salvar o token do Mercado Pago");
     } finally {
       setSavingMercadoPago(false);
+    }
+  };
+
+  const handleChangePhone = async () => {
+    if (!newPhone.trim()) {
+      toast.error("Informe o novo número com DDI (ex: 5511999999999).");
+      return;
+    }
+    if (
+      !confirm(
+        "Isso vai desconectar o WhatsApp atual dessa caixa. Você vai precisar escanear um QR code novo com o número novo antes que a IA volte a responder. Continuar?",
+      )
+    ) {
+      return;
+    }
+    setSavingPhone(true);
+    setQrScanUrl(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("update-whatsapp-number", {
+        body: { whatsapp_phone: newPhone.trim() },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      invalidateCompany();
+      setNewPhone("");
+      setQrScanUrl(
+        `${CHATWOOT_DASHBOARD_URL}/app/accounts/${data.chatwoot_account_id}/settings/inboxes/${data.chatwoot_inbox_id}`,
+      );
+      toast.success(data.message ?? "Número atualizado.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Falha ao trocar o número");
+    } finally {
+      setSavingPhone(false);
     }
   };
 
@@ -195,6 +233,45 @@ function Page() {
                     </button>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Smartphone className="size-4 text-primary" />
+                  Número do WhatsApp
+                </CardTitle>
+                <CardDescription>
+                  Número atual: <span className="font-medium text-foreground">{company?.whatsapp_phone ?? "não configurado"}</span>.
+                  Trocar o número desconecta o WhatsApp atual — você vai precisar escanear um QR code novo depois.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Label htmlFor="new_phone">Novo número (com DDI)</Label>
+                <Input
+                  id="new_phone"
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value)}
+                  placeholder="5511999999999"
+                  disabled={isLoading}
+                />
+                <div className="mt-3 flex justify-end">
+                  <GradientButton onClick={handleChangePhone} loading={savingPhone} disabled={isLoading}>
+                    Trocar número
+                  </GradientButton>
+                </div>
+                {qrScanUrl && (
+                  <a
+                    href={qrScanUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 flex items-center gap-1.5 text-sm font-medium text-woot-500 hover:underline"
+                  >
+                    <ExternalLink className="size-3.5" />
+                    Abrir Chatwoot e escanear o QR code novo
+                  </a>
+                )}
               </CardContent>
             </Card>
 
