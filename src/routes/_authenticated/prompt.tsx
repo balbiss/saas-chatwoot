@@ -248,12 +248,12 @@ function Page() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Label htmlFor="new_phone">Novo número (com DDI)</Label>
+                <Label htmlFor="new_phone">Novo número (com + e DDI)</Label>
                 <Input
                   id="new_phone"
                   value={newPhone}
                   onChange={(e) => setNewPhone(e.target.value)}
-                  placeholder="5511999999999"
+                  placeholder="+5511999999999"
                   disabled={isLoading}
                 />
                 <div className="mt-3 flex justify-end">

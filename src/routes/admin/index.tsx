@@ -184,11 +184,12 @@ function Page() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="whatsapp_phone">WhatsApp (com DDI, ex: 5511999999999)</Label>
+                  <Label htmlFor="whatsapp_phone">WhatsApp (com + e DDI, ex: +5511999999999)</Label>
                   <Input
                     id="whatsapp_phone"
                     value={form.whatsapp_phone}
                     onChange={(e) => setForm((f) => ({ ...f, whatsapp_phone: e.target.value }))}
+                    placeholder="+5511999999999"
                     required
                   />
                 </div>
@@ -299,11 +300,12 @@ function Page() {
               />
             </div>
             <div>
-              <Label htmlFor="edit_whatsapp_phone">WhatsApp (com DDI)</Label>
+              <Label htmlFor="edit_whatsapp_phone">WhatsApp (com + e DDI)</Label>
               <Input
                 id="edit_whatsapp_phone"
                 value={editForm.whatsapp_phone}
                 onChange={(e) => setEditForm((f) => ({ ...f, whatsapp_phone: e.target.value }))}
+                placeholder="+5511999999999"
               />
             </div>
             <div>
